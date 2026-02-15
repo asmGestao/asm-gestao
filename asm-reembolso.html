@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ASM - Relatório para Convênio</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3a5f">
+    <title>ASM Relatório Convênio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --azul-marinho: #1e3a5f;
@@ -21,422 +25,396 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--cinza-claro);
-            padding: 15px;
-            line-height: 1.6;
-            padding-bottom: 100px;
+            background: linear-gradient(135deg, var(--azul-marinho) 0%, #2c4a6e 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
         
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: var(--branco);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, var(--azul-marinho) 0%, #2c4a70 100%);
-            color: var(--branco);
-            padding: 25px;
             text-align: center;
-            border-bottom: 4px solid var(--dourado);
+            color: var(--branco);
+            margin-bottom: 30px;
+            padding: 20px;
         }
         
         .header h1 {
-            font-size: 1.3em;
+            font-size: 1.3rem;
             margin-bottom: 5px;
         }
         
-        .header p {
+        .header h2 {
+            font-size: 1rem;
             color: var(--dourado);
-            font-size: 0.9em;
+            font-weight: normal;
         }
         
-        .content {
+        .form-card {
+            background: var(--branco);
+            border-radius: 20px;
             padding: 25px;
-        }
-        
-        .field-group {
             margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
         }
         
-        label {
-            display: block;
+        .form-title {
             color: var(--azul-marinho);
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.9em;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--dourado);
         }
         
-        input[type="text"], input[type="date"], input[type="number"], textarea {
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--azul-marinho);
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .form-input, .form-textarea {
             width: 100%;
-            padding: 12px;
+            padding: 12px 15px;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
             font-family: inherit;
         }
         
-        input:focus, textarea:focus {
+        .form-input:focus, .form-textarea:focus {
             outline: none;
-            border-color: var(--azul-marinho);
+            border-color: var(--dourado);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
         }
         
-        textarea {
+        .form-textarea {
             min-height: 100px;
             resize: vertical;
         }
         
-        .row {
+        .prof-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
         
-        .section-title {
-            color: var(--azul-marinho);
-            font-weight: 700;
-            margin: 25px 0 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--dourado);
-            font-size: 1em;
-        }
-        
-        .signature-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid var(--dourado);
-        }
-        
-        .signature-box {
+        .signature-area {
+            background: var(--branco);
             border: 2px dashed var(--azul-marinho);
             border-radius: 10px;
-            background: var(--cinza-claro);
             margin: 15px 0;
             position: relative;
         }
         
-        .signature-canvas {
+        .signature-pad {
             width: 100%;
             height: 150px;
+            border-radius: 10px;
             touch-action: none;
-            border-radius: 8px;
-            cursor: crosshair;
             display: block;
         }
         
         .signature-label {
             position: absolute;
-            top: 50%;
+            bottom: 10px;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             color: #999;
+            font-size: 0.85rem;
             pointer-events: none;
-            font-size: 0.9em;
         }
         
-        .signature-label.hidden {
-            display: none;
-        }
-        
-        .signature-actions {
+        .btn-group {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
         
         .btn {
             flex: 1;
-            padding: 10px;
+            min-width: 80px;
+            padding: 15px 20px;
             border: none;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 25px;
+            font-size: 0.85rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-clear {
-            background: #e0e0e0;
-            color: #333;
-        }
-        
-        .btn-save {
-            background: var(--azul-marinho);
-            color: var(--branco);
-        }
-        
-        .fab-container {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 1000;
-        }
-        
-        .fab {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            gap: 8px;
             transition: all 0.3s;
         }
         
-        .fab:active {
+        .btn:active {
             transform: scale(0.95);
         }
         
-        .fab-print {
-            background: var(--dourado);
-            color: var(--azul-marinho);
-        }
-        
-        .fab-whatsapp {
-            background: #25d366;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--azul-marinho), #2c4a6e);
             color: white;
         }
         
-        .fab svg {
-            width: 28px;
-            height: 28px;
-            fill: currentColor;
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.75rem;
+            flex: none;
         }
         
         .footer {
             text-align: center;
-            padding: 15px;
-            color: #999;
-            font-size: 0.8em;
-            border-top: 1px solid #eee;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.75rem;
+            margin-top: 30px;
+            padding: 20px;
         }
         
-        .saved-signature {
-            max-width: 100%;
-            margin-top: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: white;
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 9999;
+            font-size: 0.9rem;
         }
         
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-                padding-bottom: 0;
-            }
-            .container {
-                box-shadow: none;
-                border-radius: 0;
-            }
-            .btn, .signature-actions, .fab-container {
-                display: none !important;
-            }
-            input, textarea {
-                border: none;
-                background: transparent;
-                padding: 0;
-            }
-            .signature-box {
-                border: 1px solid #000;
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        @media (max-width: 600px) {
+            .prof-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container" id="documento">
+    <div class="container">
         <div class="header">
             <h1>🏥 ASM Gestão Clínica</h1>
-            <p>Gestão Fisioterapêutica</p>
+            <h2>Relatório para Convênio / Reembolso</h2>
         </div>
         
-        <div class="content">
-            <div class="field-group">
-                <label>Fisioterapeuta</label>
-                <input type="text" id="fisio_nome" placeholder="Nome completo">
-            </div>
-            
-            <div class="field-group">
-                <label>CREFITO</label>
-                <input type="text" id="fisio_crefito" placeholder="Nº do CREFITO">
-            </div>
-            
-            <h3 style="color: var(--azul-marinho); margin: 25px 0 15px; text-align: center;">RELATÓRIO PARA CONVÊNIO / REEMBOLSO</h3>
-            
-            <div class="section-title">DADOS DO(A) PACIENTE</div>
-            
-            <div class="field-group">
-                <label>Nome</label>
-                <input type="text" id="paciente_nome" placeholder="Nome completo">
-            </div>
-            
-            <div class="row">
-                <div class="field-group">
-                    <label>CPF</label>
-                    <input type="text" id="paciente_cpf" placeholder="000.000.000-00">
+        <div class="form-card">
+            <div class="form-title">👤 Identificação do Profissional</div>
+            <div class="prof-row">
+                <div class="form-group">
+                    <label class="form-label">Fisioterapeuta</label>
+                    <input type="text" class="form-input" id="fisio_nome" placeholder="Nome completo">
                 </div>
-                <div class="field-group">
-                    <label>Data de Nascimento</label>
-                    <input type="date" id="paciente_nasc">
+                <div class="form-group">
+                    <label class="form-label">CREFITO</label>
+                    <input type="text" class="form-input" id="fisio_crefito" placeholder="Número">
                 </div>
             </div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">👤 Dados do Paciente</div>
             
-            <div class="row">
-                <div class="field-group">
-                    <label>Plano/Convênio</label>
-                    <input type="text" id="convenio" placeholder="Nome do convênio">
+            <div class="form-group">
+                <label class="form-label">Nome Completo</label>
+                <input type="text" class="form-input" id="paciente_nome" placeholder="Nome do paciente">
+            </div>
+            
+            <div class="prof-row">
+                <div class="form-group">
+                    <label class="form-label">CPF</label>
+                    <input type="text" class="form-input" id="paciente_cpf" placeholder="000.000.000-00">
                 </div>
-                <div class="field-group">
-                    <label>Nº da Carteirinha</label>
-                    <input type="text" id="carteirinha" placeholder="Número">
+                <div class="form-group">
+                    <label class="form-label">Data de Nascimento</label>
+                    <input type="date" class="form-input" id="paciente_nasc">
                 </div>
             </div>
             
-            <div class="section-title">DADOS DO PROFISSIONAL/SERVIÇO</div>
-            
-            <div class="field-group">
-                <label>Fisioterapeuta</label>
-                <input type="text" id="prof_nome" placeholder="Nome completo">
-            </div>
-            
-            <div class="row">
-                <div class="field-group">
-                    <label>CREFITO</label>
-                    <input type="text" id="prof_crefito" placeholder="Nº do CREFITO">
+            <div class="prof-row">
+                <div class="form-group">
+                    <label class="form-label">Plano/Convênio</label>
+                    <input type="text" class="form-input" id="convenio" placeholder="Nome do convênio">
                 </div>
-                <div class="field-group">
-                    <label>CNPJ/CPF</label>
-                    <input type="text" id="cnpj_cpf" placeholder="CNPJ ou CPF">
+                <div class="form-group">
+                    <label class="form-label">Nº da Carteirinha</label>
+                    <input type="text" class="form-input" id="carteirinha" placeholder="Número">
                 </div>
             </div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">🏥 Dados do Serviço</div>
             
-            <div class="field-group">
-                <label>Endereço do atendimento</label>
-                <input type="text" id="endereco" placeholder="Endereço completo">
+            <div class="form-group">
+                <label class="form-label">Fisioterapeuta Responsável</label>
+                <input type="text" class="form-input" id="prof_nome" placeholder="Nome completo">
             </div>
             
-            <div class="section-title">INFORMAÇÕES CLÍNICAS</div>
-            
-            <div class="field-group">
-                <label>Diagnóstico médico / CID</label>
-                <input type="text" id="diag_medico" placeholder="CID e descrição">
-            </div>
-            
-            <div class="field-group">
-                <label>Diagnóstico fisioterapêutico/funcional</label>
-                <textarea id="diag_fisio" placeholder="Descreva o diagnóstico fisioterapêutico..."></textarea>
-            </div>
-            
-            <div class="field-group">
-                <label>Objetivos do tratamento</label>
-                <textarea id="objetivos" placeholder="Descreva os objetivos..."></textarea>
-            </div>
-            
-            <div class="field-group">
-                <label>Plano terapêutico (frequência/duração prevista)</label>
-                <textarea id="plano" placeholder="Descreva o plano terapêutico..."></textarea>
-            </div>
-            
-            <div class="field-group">
-                <label>Procedimentos/condutas realizados</label>
-                <textarea id="procedimentos" placeholder="Descreva os procedimentos realizados..."></textarea>
-            </div>
-            
-            <div class="section-title">EVOLUÇÃO E JUSTIFICATIVA</div>
-            
-            <div class="field-group">
-                <textarea id="evolucao" placeholder="Descreva a evolução e justificativa..."></textarea>
-            </div>
-            
-            <div class="row">
-                <div class="field-group">
-                    <label>Qtd. de sessões realizadas</label>
-                    <input type="number" id="qtd_sessoes" placeholder="00">
+            <div class="prof-row">
+                <div class="form-group">
+                    <label class="form-label">CREFITO</label>
+                    <input type="text" class="form-input" id="prof_crefito" placeholder="Número">
                 </div>
-                <div class="field-group">
-                    <label>Período</label>
-                    <input type="text" id="periodo" placeholder="00/00/0000 a 00/00/0000">
+                <div class="form-group">
+                    <label class="form-label">CNPJ/CPF</label>
+                    <input type="text" class="form-input" id="cnpj_cpf" placeholder="CNPJ ou CPF">
                 </div>
             </div>
             
-            <div class="row" style="margin-top: 20px;">
-                <div class="field-group">
-                    <label>Local</label>
-                    <input type="text" id="local" placeholder="Cidade/UF">
+            <div class="form-group">
+                <label class="form-label">Endereço do Atendimento</label>
+                <input type="text" class="form-input" id="endereco" placeholder="Endereço completo">
+            </div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">📋 Informações Clínicas</div>
+            
+            <div class="form-group">
+                <label class="form-label">Diagnóstico Médico / CID</label>
+                <input type="text" class="form-input" id="diag_medico" placeholder="CID e descrição">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Diagnóstico Fisioterapêutico</label>
+                <textarea class="form-textarea" id="diag_fisio" placeholder="Descreva o diagnóstico fisioterapêutico..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Objetivos do Tratamento</label>
+                <textarea class="form-textarea" id="objetivos" placeholder="Descreva os objetivos..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Plano Terapêutico (frequência/duração)</label>
+                <textarea class="form-textarea" id="plano" placeholder="Descreva o plano terapêutico..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Procedimentos Realizados</label>
+                <textarea class="form-textarea" id="procedimentos" placeholder="Descreva os procedimentos realizados..."></textarea>
+            </div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">📊 Evolução e Justificativa</div>
+            
+            <div class="form-group">
+                <textarea class="form-textarea" id="evolucao" placeholder="Descreva a evolução e justificativa..."></textarea>
+            </div>
+            
+            <div class="prof-row">
+                <div class="form-group">
+                    <label class="form-label">Qtd. de Sessões</label>
+                    <input type="number" class="form-input" id="qtd_sessoes" placeholder="00">
                 </div>
-                <div class="field-group">
-                    <label>Data</label>
-                    <input type="date" id="data_doc">
+                <div class="form-group">
+                    <label class="form-label">Período</label>
+                    <input type="text" class="form-input" id="periodo" placeholder="DD/MM/AAAA a DD/MM/AAAA">
                 </div>
             </div>
             
-            <div class="signature-section">
-                <div class="field-group">
-                    <label>Assinatura e carimbo do(a) Fisioterapeuta (CREFITO)</label>
-                    <div class="signature-box">
-                        <canvas class="signature-canvas" id="canvasFisio"></canvas>
-                        <span class="signature-label" id="labelFisio">Toque aqui para assinar</span>
-                    </div>
-                    <div class="signature-actions">
-                        <button class="btn btn-clear" onclick="clearSignature()">🗑️ Limpar</button>
-                        <button class="btn btn-save" onclick="saveSignature()">💾 Salvar</button>
-                    </div>
-                    <img id="imgFisio" class="saved-signature" style="display:none;">
+            <div class="prof-row" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label class="form-label">Local</label>
+                    <input type="text" class="form-input" id="local" placeholder="Cidade/UF">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" class="form-input" id="data_doc">
                 </div>
             </div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">✍️ Assinatura do Fisioterapeuta</div>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Assine no quadro abaixo usando o dedo:</p>
+            
+            <div class="signature-area">
+                <canvas id="signaturePad" class="signature-pad"></canvas>
+                <span class="signature-label">Toque e arraste para assinar</span>
+            </div>
+            
+            <button class="btn btn-danger" onclick="limparAssinatura()" style="width: 100%; margin-top: 10px;">
+                🗑️ Limpar Assinatura
+            </button>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="salvarDocumento()">
+                💾 Salvar
+            </button>
+            <button class="btn btn-success" onclick="gerarPDF()">
+                📄 PDF
+            </button>
+            <button class="btn btn-whatsapp" onclick="enviarWhatsApp()">
+                💬 WhatsApp
+            </button>
         </div>
         
         <div class="footer">
-            ASM Gestão Clínica - Uso Licenciado<br>
-            Dra. Andresa Augusto
+            <p>ASM Gestão Clínica - Uso Licenciado</p>
+            <p>© Dra. Andresa Augusto Nascimento</p>
+            <p>Proibida reprodução ou compartilhamento sem autorização</p>
         </div>
     </div>
-
-    <div class="fab-container">
-        <button class="fab fab-whatsapp" onclick="compartilharWhatsApp()" title="Enviar WhatsApp">
-            <svg viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-            </svg>
-        </button>
-        
-        <button class="fab fab-print" onclick="imprimirDocumento()" title="Imprimir / Salvar PDF">
-            <svg viewBox="0 0 24 24">
-                <path d="M19 9h-1V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v3H5a3 3 0 0 0-3 3v4a2 2 0 0 0 2 2h2v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3h2a2 2 0 0 0 2-2v-4a3 3 0 0 0-3-3zM8 6h8v3H8V6zm8 12H8v-5h8v5zm2-8a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-            </svg>
-        </button>
-    </div>
+    
+    <div id="toast" class="toast"></div>
 
     <script>
-        const canvas = document.getElementById('canvasFisio');
+        // Canvas de assinatura
+        const canvas = document.getElementById('signaturePad');
         const ctx = canvas.getContext('2d');
-        const label = document.getElementById('labelFisio');
+        let isDrawing = false;
         
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-            ctx.strokeStyle = '#1e3a5f';
+        function initCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width - 4;
+            canvas.height = 150;
+            ctx.strokeStyle = '#000';
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
         }
         
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-        
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            initCanvas();
+            carregarDados();
+            document.getElementById('data_doc').valueAsDate = new Date();
+        });
         
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
@@ -448,86 +426,273 @@
             };
         }
         
-        function startDrawing(e) {
+        canvas.addEventListener('mousedown', (e) => {
             isDrawing = true;
             const pos = getPos(e);
-            lastX = pos.x;
-            lastY = pos.y;
-            label.classList.add('hidden');
-            e.preventDefault();
-        }
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            document.querySelector('.signature-label').style.display = 'none';
+        });
         
-        function draw(e) {
+        canvas.addEventListener('mousemove', (e) => {
             if (!isDrawing) return;
             const pos = getPos(e);
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
-            lastX = pos.x;
-            lastY = pos.y;
-            e.preventDefault();
-        }
-        
-        function stopDrawing() {
-            isDrawing = false;
-        }
-        
-        canvas.addEventListener('touchstart', startDrawing, {passive: false});
-        canvas.addEventListener('touchmove', draw, {passive: false});
-        canvas.addEventListener('touchend', stopDrawing);
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
-        
-        function clearSignature() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            label.classList.remove('hidden');
-            document.getElementById('imgFisio').style.display = 'none';
-        }
-        
-        function saveSignature() {
-            const img = document.getElementById('imgFisio');
-            img.src = canvas.toDataURL('image/png');
-            img.style.display = 'block';
-        }
-        
-        function isCanvasEmpty() {
-            const blank = document.createElement('canvas');
-            blank.width = canvas.width;
-            blank.height = canvas.height;
-            return canvas.toDataURL() === blank.toDataURL();
-        }
-        
-        function imprimirDocumento() {
-            if (!isCanvasEmpty()) saveSignature();
-            setTimeout(() => {
-                window.print();
-            }, 300);
-        }
-        
-        function compartilharWhatsApp() {
-            const nome = document.getElementById('paciente_nome').value || 'Paciente';
-            const convenio = document.getElementById('convenio').value || 'Convênio';
-            const texto = `Olá ${nome}! Segue seu Relatório para ${convenio} da ASM Gestão Clínica. Att, Dra. Andresa Augusto`;
-            
-            window.location.href = `https://wa.me/?text=${encodeURIComponent(texto)}`;
-        }
-        
-        document.getElementById('data_doc').valueAsDate = new Date();
-        
-        const dados = JSON.parse(localStorage.getItem('asm_dados') || '{}');
-        if (dados.fisio_nome) document.getElementById('fisio_nome').value = dados.fisio_nome;
-        if (dados.fisio_crefito) document.getElementById('fisio_crefito').value = dados.fisio_crefito;
-        
-        ['fisio_nome', 'fisio_crefito'].forEach(id => {
-            document.getElementById(id).addEventListener('blur', () => {
-                const dados = JSON.parse(localStorage.getItem('asm_dados') || '{}');
-                dados[id] = document.getElementById(id).value;
-                localStorage.setItem('asm_dados', JSON.stringify(dados));
-            });
         });
+        
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+        
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            document.querySelector('.signature-label').style.display = 'none';
+        }, {passive: false});
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }, {passive: false});
+        
+        canvas.addEventListener('touchend', () => isDrawing = false);
+        
+        function limparAssinatura() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.querySelector('.signature-label').style.display = 'block';
+        }
+        
+        function salvarDocumento() {
+            const nome = document.getElementById('paciente_nome').value;
+            if (!nome) {
+                mostrarToast('⚠️ Informe o nome do paciente');
+                return;
+            }
+            
+            const doc = {
+                tipo: 'Relatorio_Convenio',
+                fisio_nome: document.getElementById('fisio_nome').value,
+                fisio_crefito: document.getElementById('fisio_crefito').value,
+                paciente_nome: nome,
+                paciente_cpf: document.getElementById('paciente_cpf').value,
+                paciente_nasc: document.getElementById('paciente_nasc').value,
+                convenio: document.getElementById('convenio').value,
+                carteirinha: document.getElementById('carteirinha').value,
+                prof_nome: document.getElementById('prof_nome').value,
+                prof_crefito: document.getElementById('prof_crefito').value,
+                cnpj_cpf: document.getElementById('cnpj_cpf').value,
+                endereco: document.getElementById('endereco').value,
+                diag_medico: document.getElementById('diag_medico').value,
+                diag_fisio: document.getElementById('diag_fisio').value,
+                objetivos: document.getElementById('objetivos').value,
+                plano: document.getElementById('plano').value,
+                procedimentos: document.getElementById('procedimentos').value,
+                evolucao: document.getElementById('evolucao').value,
+                qtd_sessoes: document.getElementById('qtd_sessoes').value,
+                periodo: document.getElementById('periodo').value,
+                local: document.getElementById('local').value,
+                data_doc: document.getElementById('data_doc').value,
+                assinatura: canvas.toDataURL(),
+                dataCriacao: new Date().toISOString()
+            };
+            
+            localStorage.setItem('relatorio_convenio_' + nome, JSON.stringify(doc));
+            mostrarToast('✅ Documento salvo com sucesso!');
+        }
+        
+        function carregarDados() {
+            const chaves = Object.keys(localStorage).filter(k => k.startsWith('relatorio_convenio_'));
+            if (chaves.length > 0) {
+                const ultimo = localStorage.getItem(chaves[chaves.length - 1]);
+                const doc = JSON.parse(ultimo);
+                
+                document.getElementById('fisio_nome').value = doc.fisio_nome || '';
+                document.getElementById('fisio_crefito').value = doc.fisio_crefito || '';
+                document.getElementById('paciente_nome').value = doc.paciente_nome || '';
+                document.getElementById('paciente_cpf').value = doc.paciente_cpf || '';
+                document.getElementById('paciente_nasc').value = doc.paciente_nasc || '';
+                document.getElementById('convenio').value = doc.convenio || '';
+                document.getElementById('carteirinha').value = doc.carteirinha || '';
+                document.getElementById('prof_nome').value = doc.prof_nome || '';
+                document.getElementById('prof_crefito').value = doc.prof_crefito || '';
+                document.getElementById('cnpj_cpf').value = doc.cnpj_cpf || '';
+                document.getElementById('endereco').value = doc.endereco || '';
+                document.getElementById('diag_medico').value = doc.diag_medico || '';
+                document.getElementById('diag_fisio').value = doc.diag_fisio || '';
+                document.getElementById('objetivos').value = doc.objetivos || '';
+                document.getElementById('plano').value = doc.plano || '';
+                document.getElementById('procedimentos').value = doc.procedimentos || '';
+                document.getElementById('evolucao').value = doc.evolucao || '';
+                document.getElementById('qtd_sessoes').value = doc.qtd_sessoes || '';
+                document.getElementById('periodo').value = doc.periodo || '';
+                document.getElementById('local').value = doc.local || '';
+                document.getElementById('data_doc').value = doc.data_doc || '';
+                
+                if (doc.assinatura) {
+                    const img = new Image();
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0);
+                        document.querySelector('.signature-label').style.display = 'none';
+                    };
+                    img.src = doc.assinatura;
+                }
+            }
+        }
+        
+        async function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const paciente = document.getElementById('paciente_nome').value;
+            const convenio = document.getElementById('convenio').value;
+            
+            // Cabeçalho
+            doc.setFillColor(30, 58, 95);
+            doc.rect(0, 0, 210, 35, 'F');
+            
+            doc.setTextColor(201, 162, 39);
+            doc.setFontSize(18);
+            doc.text('ASM Gestão Clínica', 105, 15, { align: 'center' });
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.text('Gestão Fisioterapêutica', 105, 25, { align: 'center' });
+            
+            // Título
+            doc.setTextColor(30, 58, 95);
+            doc.setFontSize(14);
+            doc.text('RELATÓRIO PARA CONVÊNIO / REEMBOLSO', 105, 50, { align: 'center' });
+            
+            let y = 65;
+            
+            // Dados do paciente
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('DADOS DO PACIENTE', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            doc.text(`Nome: ${paciente || '_________________________________'}`, 20, y);
+            y += 7;
+            doc.text(`CPF: ${document.getElementById('paciente_cpf').value || '_________________________________'}`, 20, y);
+            y += 7;
+            doc.text(`Data Nasc.: ${document.getElementById('paciente_nasc').value ? new Date(document.getElementById('paciente_nasc').value).toLocaleDateString('pt-BR') : '___/___/_____'}`, 20, y);
+            y += 7;
+            doc.text(`Convênio: ${convenio || '_________________________________'}`, 20, y);
+            y += 7;
+            doc.text(`Carteirinha: ${document.getElementById('carteirinha').value || '_________________________________'}`, 20, y);
+            
+            // Dados do profissional
+            y += 12;
+            doc.setFont(undefined, 'bold');
+            doc.text('DADOS DO PROFISSIONAL', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            doc.text(`Fisioterapeuta: ${document.getElementById('fisio_nome').value || '_________________________________'}`, 20, y);
+            y += 7;
+            doc.text(`CREFITO: ${document.getElementById('fisio_crefito').value || '_________________________________'}`, 20, y);
+            
+            // Informações clínicas
+            y += 12;
+            doc.setFont(undefined, 'bold');
+            doc.text('INFORMAÇÕES CLÍNICAS', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            doc.text(`Diagnóstico Médico: ${document.getElementById('diag_medico').value || '_________________________________'}`, 20, y);
+            y += 7;
+            
+            const diagFisio = document.getElementById('diag_fisio').value;
+            if (diagFisio) {
+                const lines = doc.splitTextToSize(`Diagnóstico Fisioterapêutico: ${diagFisio}`, 170);
+                doc.text(lines, 20, y);
+                y += lines.length * 5;
+            }
+            
+            const objetivos = document.getElementById('objetivos').value;
+            if (objetivos) {
+                y += 5;
+                const lines = doc.splitTextToSize(`Objetivos: ${objetivos}`, 170);
+                doc.text(lines, 20, y);
+                y += lines.length * 5;
+            }
+            
+            const plano = document.getElementById('plano').value;
+            if (plano) {
+                y += 5;
+                const lines = doc.splitTextToSize(`Plano Terapêutico: ${plano}`, 170);
+                doc.text(lines, 20, y);
+                y += lines.length * 5;
+            }
+            
+            const procedimentos = document.getElementById('procedimentos').value;
+            if (procedimentos) {
+                y += 5;
+                const lines = doc.splitTextToSize(`Procedimentos: ${procedimentos}`, 170);
+                doc.text(lines, 20, y);
+                y += lines.length * 5;
+            }
+            
+            // Evolução
+            y += 10;
+            doc.setFont(undefined, 'bold');
+            doc.text('EVOLUÇÃO E JUSTIFICATIVA', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            const evolucao = document.getElementById('evolucao').value;
+            if (evolucao) {
+                const lines = doc.splitTextToSize(evolucao, 170);
+                doc.text(lines, 20, y);
+                y += lines.length * 5;
+            }
+            
+            // Sessões
+            y += 10;
+            doc.text(`Quantidade de Sessões: ${document.getElementById('qtd_sessoes').value || '___'}`, 20, y);
+            y += 7;
+            doc.text(`Período: ${document.getElementById('periodo').value || '_________________________________'}`, 20, y);
+            y += 7;
+            doc.text(`Local e Data: ${document.getElementById('local').value || '____________________'}, ${document.getElementById('data_doc').value ? new Date(document.getElementById('data_doc').value).toLocaleDateString('pt-BR') : '___/___/_____'}`, 20, y);
+            
+            // Assinatura
+            y += 20;
+            doc.line(20, y, 90, y);
+            y += 5;
+            doc.setFontSize(9);
+            doc.text('Assinatura e Carimbo do(a) Fisioterapeuta (CREFITO)', 20, y);
+            
+            // Rodapé
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('ASM Gestão Clínica -- Uso Licenciado', 105, 285, { align: 'center' });
+            doc.text('© ASM Gestão Clínica -- Dra. Andresa Augusto Nascimento | Uso licenciado ao comprador.', 105, 290, { align: 'center' });
+            doc.text('Proibida reprodução ou compartilhamento sem autorização.', 105, 295, { align: 'center' });
+            
+            doc.save(`Relatorio_Convenio_${paciente || 'Paciente'}.pdf`);
+            mostrarToast('📄 PDF gerado com sucesso!');
+        }
+        
+        function enviarWhatsApp() {
+            const nome = document.getElementById('paciente_nome').value;
+            const convenio = document.getElementById('convenio').value;
+            
+            let mensagem = `*Relatório para Convênio*%0A%0A`;
+            mensagem += `Paciente: ${nome}%0A`;
+            mensagem += `Convênio: ${convenio}%0A%0A`;
+            mensagem += `Documento gerado via ASM Gestão Clínica`;
+            
+            window.open(`https://wa.me/?text=${mensagem}`, '_blank');
+        }
+        
+        function mostrarToast(mensagem) {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
     </script>
 </body>
 </html>
