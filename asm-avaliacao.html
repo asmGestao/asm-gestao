@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ficha de Avaliação - ASM Gestão Clínica</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3a5f">
+    <title>ASM - Ficha de Avaliação</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        :root {
+            --azul-marinho: #1e3a5f;
+            --dourado: #c9a227;
+            --cinza-claro: #f5f5f5;
+            --branco: #ffffff;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -14,133 +25,153 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            background: linear-gradient(135deg, var(--azul-marinho) 0%, #2c4a6e 100%);
             min-height: 100vh;
-            padding: 10px;
-            color: #333;
+            padding: 20px;
         }
         
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
-            color: white;
-            padding: 20px;
             text-align: center;
+            color: var(--branco);
+            margin-bottom: 30px;
+            padding: 20px;
         }
         
         .header h1 {
             font-size: 1.5rem;
             margin-bottom: 5px;
-            font-weight: 600;
         }
         
-        .header .subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            color: #d4af37;
-        }
-        
-        .fisioterapeuta-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-bottom: 2px solid #1e3a5f;
-        }
-        
-        .fisioterapeuta-info h3 {
-            color: #1e3a5f;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .fisioterapeuta-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .input-group {
-            margin-bottom: 10px;
-        }
-        
-        .input-group label {
-            display: block;
-            font-size: 0.8rem;
-            color: #666;
-            margin-bottom: 3px;
-            font-weight: 500;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: #1e3a5f;
-            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
-        }
-        
-        .section {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .section-title {
-            color: #1e3a5f;
+        .header h2 {
             font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #d4af37;
+            color: var(--dourado);
+            font-weight: normal;
+        }
+        
+        .form-card {
+            background: var(--branco);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        
+        .form-title {
+            color: var(--azul-marinho);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--dourado);
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
-        .section-title::before {
+        .form-title::before {
             content: '';
             width: 4px;
             height: 20px;
-            background: #d4af37;
+            background: var(--dourado);
             border-radius: 2px;
         }
         
-        .dados-paciente {
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--azul-marinho);
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--dourado);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
+        }
+        
+        /* DATA AJUSTADA - NÃO SAI DA CAIXA */
+        input[type="date"].form-input,
+        input[type="time"].form-input,
+        input[type="number"].form-input {
+            width: 100%;
+            max-width: 100%;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+        }
+        
+        .prof-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .prof-row-3 {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr;
             gap: 10px;
         }
         
-        .full-width {
-            grid-column: 1 / -1;
+        .textarea-group {
+            margin-bottom: 15px;
+        }
+        
+        .textarea-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--azul-marinho);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .textarea-group textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .textarea-group textarea:focus {
+            outline: none;
+            border-color: var(--dourado);
         }
         
         .escala-dor {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
+            background: var(--cinza-claro);
+            padding: 20px;
+            border-radius: 15px;
             margin-top: 10px;
+            border-left: 4px solid var(--dourado);
         }
         
         .escala-dor h4 {
-            color: #1e3a5f;
+            color: var(--azul-marinho);
             margin-bottom: 15px;
             font-size: 0.9rem;
+            text-align: center;
         }
         
         .escala-numeros {
@@ -175,9 +206,9 @@
         }
         
         .numero-dor.selected {
-            background: #1e3a5f;
+            background: var(--azul-marinho);
             color: white;
-            border-color: #1e3a5f;
+            border-color: var(--azul-marinho);
             transform: scale(1.1);
         }
         
@@ -200,34 +231,6 @@
             color: #666;
         }
         
-        .textarea-group {
-            margin-bottom: 15px;
-        }
-        
-        .textarea-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: #1e3a5f;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
-        .textarea-group textarea {
-            width: 100%;
-            min-height: 80px;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            resize: vertical;
-            font-family: inherit;
-        }
-        
-        .textarea-group textarea:focus {
-            outline: none;
-            border-color: #1e3a5f;
-        }
-        
         .checkbox-group {
             display: flex;
             gap: 20px;
@@ -239,30 +242,37 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
             cursor: pointer;
         }
         
         .checkbox-item input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            accent-color: #1e3a5f;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--azul-marinho);
             cursor: pointer;
         }
         
         .checkbox-item label {
             cursor: pointer;
             font-size: 0.9rem;
+            color: #444;
+            margin: 0;
         }
         
         .estrela-dor-container {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
+            background: var(--cinza-claro);
+            padding: 20px;
+            border-radius: 15px;
             margin-top: 10px;
+            border-left: 4px solid var(--dourado);
         }
         
         .estrela-dor-container h4 {
-            color: #1e3a5f;
+            color: var(--azul-marinho);
             margin-bottom: 15px;
             font-size: 0.9rem;
             text-align: center;
@@ -275,18 +285,18 @@
         
         .regiao-item {
             background: white;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 12px;
             border: 2px solid #e0e0e0;
         }
         
         .regiao-item h5 {
-            color: #1e3a5f;
-            margin-bottom: 12px;
+            color: var(--azul-marinho);
+            margin-bottom: 15px;
             font-size: 1rem;
             text-align: center;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--dourado);
         }
         
         .movimentos-grid {
@@ -296,9 +306,9 @@
         }
         
         .movimento-item {
-            background: #f0f0f0;
+            background: var(--cinza-claro);
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 10px;
         }
         
         .movimento-item h6 {
@@ -318,7 +328,7 @@
             padding: 10px 5px;
             border: 2px solid #ddd;
             background: white;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.3s;
@@ -351,8 +361,8 @@
         
         .captor-item {
             background: white;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 12px;
             border: 2px solid #e0e0e0;
         }
         
@@ -367,7 +377,7 @@
         
         .captor-nome {
             font-weight: 600;
-            color: #1e3a5f;
+            color: var(--azul-marinho);
             font-size: 0.95rem;
         }
         
@@ -408,128 +418,145 @@
         
         .captor-obs {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.85rem;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
             margin-top: 8px;
         }
         
         .assinatura-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
+            background: var(--cinza-claro);
+            padding: 20px;
+            border-radius: 15px;
             margin-top: 15px;
+            border-left: 4px solid var(--dourado);
         }
         
         .assinatura-section h4 {
-            color: #1e3a5f;
-            margin-bottom: 10px;
+            color: var(--azul-marinho);
+            margin-bottom: 15px;
             font-size: 0.9rem;
         }
         
-        .canvas-container {
+        .signature-area {
             background: white;
-            border: 2px solid #ddd;
+            border: 2px dashed var(--azul-marinho);
             border-radius: 10px;
-            overflow: hidden;
-            touch-action: none;
+            position: relative;
         }
         
-        #assinaturaCanvas {
+        .signature-pad {
             width: 100%;
             height: 150px;
-            display: block;
-            cursor: crosshair;
+            border-radius: 10px;
             touch-action: none;
+            display: block;
         }
         
-        .assinatura-botoes {
+        .signature-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #999;
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+        
+        .btn-group {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .btn-assinatura {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-        
-        .btn-limpar {
-            background: #f44336;
-            color: white;
-        }
-        
-        .btn-limpar:active {
-            background: #d32f2f;
-        }
-        
-        .acoes-container {
-            padding: 20px;
-            background: #f8f9fa;
-            display: flex;
-            gap: 10px;
+            margin-top: 20px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         
-        .btn-acao {
+        .btn {
             flex: 1;
             min-width: 100px;
-            height: 50px;
+            max-width: 150px;
+            padding: 15px 20px;
             border: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            gap: 8px;
+            transition: all 0.3s;
         }
         
-        .btn-acao:active {
+        .btn:active {
             transform: scale(0.95);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .btn-pdf {
-            background: #1e3a5f;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--azul-marinho), #2c4a6e);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
         }
         
         .btn-whatsapp {
-            background: #25d366;
+            background: linear-gradient(135deg, #25D366, #128C7E);
             color: white;
         }
         
-        .btn-salvar {
-            background: #d4af37;
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
             color: white;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.75rem;
+            flex: none;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.75rem;
+            margin-top: 30px;
+            padding: 20px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 9999;
+            font-size: 0.9rem;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
         
         @media (max-width: 600px) {
-            .dados-paciente {
+            .prof-row, .prof-row-3 {
                 grid-template-columns: 1fr;
             }
-            
-            .fisioterapeuta-row {
-                grid-template-columns: 1fr;
-            }
-            
             .movimentos-grid {
                 grid-template-columns: 1fr;
             }
-            
             .escala-numeros {
                 justify-content: center;
             }
-            
             .numero-dor {
                 width: 30px;
                 height: 30px;
@@ -541,55 +568,55 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Ficha de Avaliação</h1>
-            <div class="subtitle">ASM Gestão Clínica</div>
+            <h1>🏥 ASM Gestão Clínica</h1>
+            <h2>Ficha de Avaliação Fisioterapêutica</h2>
         </div>
         
-        <div class="fisioterapeuta-info">
-            <h3>Dados do Profissional</h3>
-            <div class="fisioterapeuta-row">
-                <div class="input-group">
-                    <label>Fisioterapeuta</label>
-                    <input type="text" id="nomeFisio" placeholder="Nome completo">
+        <div class="form-card">
+            <div class="form-title">👤 Dados do Profissional</div>
+            <div class="prof-row">
+                <div class="form-group">
+                    <label class="form-label">Fisioterapeuta</label>
+                    <input type="text" class="form-input" id="nomeFisio" placeholder="Nome completo">
                 </div>
-                <div class="input-group">
-                    <label>CREFITO</label>
-                    <input type="text" id="crefito" placeholder="Nº do CREFITO">
+                <div class="form-group">
+                    <label class="form-label">CREFITO</label>
+                    <input type="text" class="form-input" id="crefito" placeholder="Nº do CREFITO">
                 </div>
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Dados do Paciente</div>
-            <div class="dados-paciente">
-                <div class="input-group full-width">
-                    <label>Nome</label>
-                    <input type="text" id="nomePaciente" placeholder="Nome completo do paciente">
+        <div class="form-card">
+            <div class="form-title">👤 Dados do Paciente</div>
+            <div class="prof-row-3">
+                <div class="form-group">
+                    <label class="form-label">Nome Completo</label>
+                    <input type="text" class="form-input" id="nomePaciente" placeholder="Nome completo">
                 </div>
-                <div class="input-group">
-                    <label>Idade</label>
-                    <input type="number" id="idade" placeholder="Anos">
+                <div class="form-group">
+                    <label class="form-label">Idade</label>
+                    <input type="number" class="form-input" id="idade" placeholder="Anos">
                 </div>
-                <div class="input-group">
-                    <label>Data da Avaliação</label>
-                    <input type="date" id="dataAvaliacao">
+                <div class="form-group">
+                    <label class="form-label">Data Avaliação</label>
+                    <input type="date" class="form-input" id="dataAvaliacao">
                 </div>
-                <div class="input-group full-width">
-                    <label>Profissão</label>
-                    <input type="text" id="profissao" placeholder="Profissão do paciente">
-                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Profissão</label>
+                <input type="text" class="form-input" id="profissao" placeholder="Profissão do paciente">
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Queixa Principal</div>
+        <div class="form-card">
+            <div class="form-title">📝 Queixa Principal</div>
             <div class="textarea-group">
                 <textarea id="queixaPrincipal" placeholder="Descreva a queixa principal do paciente..."></textarea>
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Evolução dos Sintomas</div>
+        <div class="form-card">
+            <div class="form-title">📖 Evolução dos Sintomas</div>
             <div class="textarea-group">
                 <label>Como começou?</label>
                 <textarea id="comoComecou" placeholder="Descreva como os sintomas iniciaram..."></textarea>
@@ -600,8 +627,8 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Escala Numérica Verbal da Dor</div>
+        <div class="form-card">
+            <div class="form-title">😣 Escala Numérica da Dor</div>
             <div class="escala-dor">
                 <h4>Toque no número correspondente à dor (0 a 10)</h4>
                 <div class="escala-numeros">
@@ -627,15 +654,15 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Extensão da Dor</div>
+        <div class="form-card">
+            <div class="form-title">📍 Extensão da Dor</div>
             <div class="textarea-group">
                 <textarea id="extensaoDor" placeholder="Descreva a extensão da dor..."></textarea>
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Tratamentos Anteriores</div>
+        <div class="form-card">
+            <div class="form-title">💊 Tratamentos Anteriores</div>
             <div class="textarea-group">
                 <label>Medicação</label>
                 <textarea id="medicacao" placeholder="Medicações em uso..."></textarea>
@@ -650,8 +677,8 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Características da Dor</div>
+        <div class="form-card">
+            <div class="form-title">🔍 Características da Dor</div>
             <div class="textarea-group">
                 <label>Frequência da dor</label>
                 <textarea id="frequenciaDor" placeholder="Constante, intermitente, etc..."></textarea>
@@ -666,21 +693,21 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Questões Viscerais</div>
+        <div class="form-card">
+            <div class="form-title">🌙 Questões Viscerais</div>
             <div class="checkbox-group">
-                <div class="checkbox-item">
+                <label class="checkbox-item">
                     <input type="checkbox" id="acordaDor">
                     <label for="acordaDor">Acorda com dor?</label>
-                </div>
-                <div class="checkbox-item">
+                </label>
+                <label class="checkbox-item">
                     <input type="checkbox" id="dormeDor">
                     <label for="dormeDor">Dorme com dor?</label>
-                </div>
-                <div class="checkbox-item">
+                </label>
+                <label class="checkbox-item">
                     <input type="checkbox" id="dormeBem">
                     <label for="dormeBem">Dorme bem?</label>
-                </div>
+                </label>
             </div>
             <div class="textarea-group">
                 <label>Posição de dormir</label>
@@ -688,15 +715,15 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Contra-indicação / Exames de Imagem</div>
+        <div class="form-card">
+            <div class="form-title">🚫 Contra-indicação / Exames</div>
             <div class="textarea-group">
                 <textarea id="contraindicacao" placeholder="Contra-indicações e exames de imagem..."></textarea>
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Condições Gerais</div>
+        <div class="form-card">
+            <div class="form-title">🥗 Condições Gerais</div>
             <div class="textarea-group">
                 <label>Alimentação</label>
                 <textarea id="alimentacao" placeholder="Hábitos alimentares..."></textarea>
@@ -711,8 +738,8 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Inspeção</div>
+        <div class="form-card">
+            <div class="form-title">👁️ Inspeção</div>
             <div class="textarea-group">
                 <label>Inspeção Estática</label>
                 <textarea id="inspecaoEstatica" placeholder="Observações da inspeção estática..."></textarea>
@@ -723,8 +750,8 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Estrela da Dor</div>
+        <div class="form-card">
+            <div class="form-title">⭐ Estrela da Dor</div>
             <div class="estrela-dor-container">
                 <h4>Avaliação dos Movimentos (Toque nos botões)</h4>
                 <div class="regioes-dor">
@@ -734,43 +761,43 @@
                             <div class="movimento-item">
                                 <h6>Flexão (F)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-flexao')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-flexao')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Extensão (E)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-extensao')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-extensao')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Incl. Esq (Se)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-se')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-se')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Incl. Dir (Sd)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-sd')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-sd')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Rotação Esq (Re)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-re')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-re')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Rotação Dir (Rd)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-rd')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-rd')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                         </div>
@@ -782,43 +809,43 @@
                             <div class="movimento-item">
                                 <h6>Flexão (F)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-flexao')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-flexao')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Extensão (E)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-extensao')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-extensao')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Incl. Esq (Se)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-se')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-se')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Incl. Dir (Sd)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-sd')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-sd')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Rotação Esq (Re)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-re')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-re')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Rotação Dir (Rd)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-rd')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-rd')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                         </div>
@@ -830,43 +857,43 @@
                             <div class="movimento-item">
                                 <h6>Flexão (F)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-flexao')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-flexao')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Extensão (E)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-extensao')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-extensao')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Incl. Esq (Se)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-se')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-se')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Incl. Dir (Sd)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-sd')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-sd')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Rotação Esq (Re)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-re')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-re')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                             <div class="movimento-item">
                                 <h6>Rotação Dir (Rd)</h6>
                                 <div class="movimento-botoes">
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-rd')">Com dor</button>
-                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-rd')">Sem dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this)">Sem dor</button>
                                 </div>
                             </div>
                         </div>
@@ -875,15 +902,15 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Diagnóstico por Exercício Repetitivo</div>
+        <div class="form-card">
+            <div class="form-title">🏃 Diagnóstico por Exercício</div>
             <div class="textarea-group">
                 <textarea id="diagnosticoExercicio" placeholder="Resultados dos testes de exercício repetitivo..."></textarea>
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Captores Posturais</div>
+        <div class="form-card">
+            <div class="form-title">🎯 Captores Posturais</div>
             <div class="captores-grid">
                 <div class="captor-item">
                     <div class="captor-header">
@@ -942,49 +969,65 @@
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Testes Neurológicos e Ortopédicos</div>
+        <div class="form-card">
+            <div class="form-title">🧠 Testes Neurológicos</div>
             <div class="textarea-group">
                 <textarea id="testesNeuro" placeholder="Descreva os testes realizados e seus resultados..."></textarea>
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Objetivos do Tratamento</div>
+        <div class="form-card">
+            <div class="form-title">🎯 Objetivos do Tratamento</div>
             <div class="textarea-group">
                 <textarea id="objetivos" placeholder="Objetivos terapêuticos estabelecidos..."></textarea>
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">Assinatura Digital</div>
+        <div class="form-card">
+            <div class="form-title">✍️ Assinatura Digital</div>
             <div class="assinatura-section">
                 <h4>Assine com o dedo na tela abaixo:</h4>
-                <div class="canvas-container">
-                    <canvas id="assinaturaCanvas"></canvas>
+                <div class="signature-area">
+                    <canvas id="assinaturaCanvas" class="signature-pad"></canvas>
+                    <span class="signature-label">Toque e arraste para assinar</span>
                 </div>
-                <div class="assinatura-botoes">
-                    <button type="button" class="btn-assinatura btn-limpar" onclick="limparAssinatura()">Limpar</button>
+                <div class="btn-group" style="margin-top: 10px;">
+                    <button class="btn btn-danger btn-small" onclick="limparAssinatura()">🗑️ Limpar</button>
                 </div>
             </div>
         </div>
         
-        <div class="acoes-container">
-            <button type="button" class="btn-acao btn-salvar" onclick="salvarFicha()" title="Salvar">💾</button>
-            <button type="button" class="btn-acao btn-pdf" onclick="gerarPDF()" title="Gerar PDF">📄</button>
-            <button type="button" class="btn-acao btn-whatsapp" onclick="enviarWhatsApp()" title="Enviar WhatsApp">💬</button>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="salvarFicha()">
+                💾 Salvar
+            </button>
+            <button class="btn btn-success" onclick="gerarPDF()">
+                📄 PDF
+            </button>
+            <button class="btn btn-whatsapp" onclick="enviarWhatsApp()">
+                💬 WhatsApp
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>ASM Gestão Clínica - Uso Licenciado</p>
+            <p>© Dra. Andresa Augusto Nascimento</p>
+            <p>Proibida reprodução ou compartilhamento sem autorização</p>
         </div>
     </div>
+    
+    <div id="toast" class="toast"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         let nivelDorSelecionado = null;
         let assinaturaCanvas, assinaturaCtx;
         let isDrawing = false;
+        let hasSignature = false;
         
         document.addEventListener('DOMContentLoaded', function() {
             initCanvas();
             document.getElementById('dataAvaliacao').valueAsDate = new Date();
+            carregarDados();
         });
         
         function selecionarDor(elemento) {
@@ -995,7 +1038,7 @@
             nivelDorSelecionado = elemento.getAttribute('data-valor');
         }
         
-        function toggleDor(botao, grupo) {
+        function toggleDor(botao) {
             const container = botao.parentElement;
             const botoes = container.querySelectorAll('.btn-dor');
             botoes.forEach(function(btn) {
@@ -1025,12 +1068,13 @@
             assinaturaCanvas = document.getElementById('assinaturaCanvas');
             assinaturaCtx = assinaturaCanvas.getContext('2d');
             const container = assinaturaCanvas.parentElement;
-            assinaturaCanvas.width = container.offsetWidth;
+            assinaturaCanvas.width = container.offsetWidth - 4;
             assinaturaCanvas.height = 150;
             assinaturaCtx.strokeStyle = '#1e3a5f';
             assinaturaCtx.lineWidth = 2;
             assinaturaCtx.lineCap = 'round';
             assinaturaCtx.lineJoin = 'round';
+            
             assinaturaCanvas.addEventListener('mousedown', startDrawing);
             assinaturaCanvas.addEventListener('mousemove', draw);
             assinaturaCanvas.addEventListener('mouseup', stopDrawing);
@@ -1042,9 +1086,11 @@
         
         function startDrawing(e) {
             isDrawing = true;
+            hasSignature = true;
             const rect = assinaturaCanvas.getBoundingClientRect();
             assinaturaCtx.beginPath();
             assinaturaCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            assinaturaCanvas.parentElement.querySelector('.signature-label').style.display = 'none';
         }
         
         function draw(e) {
@@ -1066,8 +1112,10 @@
             const y = touch.clientY - rect.top;
             if (e.type === 'touchstart') {
                 isDrawing = true;
+                hasSignature = true;
                 assinaturaCtx.beginPath();
                 assinaturaCtx.moveTo(x, y);
+                assinaturaCanvas.parentElement.querySelector('.signature-label').style.display = 'none';
             } else if (e.type === 'touchmove' && isDrawing) {
                 assinaturaCtx.lineTo(x, y);
                 assinaturaCtx.stroke();
@@ -1076,88 +1124,30 @@
         
         function limparAssinatura() {
             assinaturaCtx.clearRect(0, 0, assinaturaCanvas.width, assinaturaCanvas.height);
+            hasSignature = false;
+            assinaturaCanvas.parentElement.querySelector('.signature-label').style.display = 'block';
         }
         
         function salvarFicha() {
             const dados = coletarDados();
-            localStorage.setItem('fichaAvaliacao_' + Date.now(), JSON.stringify(dados));
-            alert('Ficha salva com sucesso!');
+            const nome = document.getElementById('nomePaciente').value || 'Paciente';
+            localStorage.setItem('fichaAvaliacao_' + nome + '_' + Date.now(), JSON.stringify(dados));
+            
+            // Salvar dados do fisioterapeuta
+            const dadosFisio = {
+                nomeFisio: document.getElementById('nomeFisio').value,
+                crefito: document.getElementById('crefito').value
+            };
+            localStorage.setItem('asm_dados_fisio', JSON.stringify(dadosFisio));
+            
+            mostrarToast('✅ Ficha salva com sucesso!');
         }
         
-        function gerarPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFontSize(20);
-            doc.setTextColor(30, 58, 95);
-            doc.text('Ficha de Avaliação', 105, 20, { align: 'center' });
-            doc.setFontSize(12);
-            doc.setTextColor(212, 175, 55);
-            doc.text('ASM Gestão Clínica', 105, 28, { align: 'center' });
-            doc.setFontSize(10);
-            doc.setTextColor(0, 0, 0);
-            let y = 40;
-            const nomeFisio = document.getElementById('nomeFisio').value;
-            const crefito = document.getElementById('crefito').value;
-            if (nomeFisio) {
-                doc.text('Fisioterapeuta: ' + nomeFisio, 10, y);
-                y += 7;
-            }
-            if (crefito) {
-                doc.text('CREFITO: ' + crefito, 10, y);
-                y += 10;
-            }
-            const nomePaciente = document.getElementById('nomePaciente').value;
-            const idade = document.getElementById('idade').value;
-            const data = document.getElementById('dataAvaliacao').value;
-            if (nomePaciente || idade || data) {
-                doc.setFontSize(12);
-                doc.setTextColor(30, 58, 95);
-                doc.text('Dados do Paciente', 10, y);
-                y += 7;
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                if (nomePaciente) doc.text('Nome: ' + nomePaciente, 10, y);
-                y += 7;
-                if (idade) doc.text('Idade: ' + idade + ' anos', 10, y);
-                y += 7;
-                if (data) doc.text('Data: ' + data, 10, y);
-                y += 10;
-            }
-            const queixa = document.getElementById('queixaPrincipal').value;
-            if (queixa) {
-                doc.setFontSize(12);
-                doc.setTextColor(30, 58, 95);
-                doc.text('Queixa Principal', 10, y);
-                y += 7;
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                const linhas = doc.splitTextToSize(queixa, 190);
-                doc.text(linhas, 10, y);
-                y += linhas.length * 5 + 5;
-            }
-            if (nivelDorSelecionado !== null) {
-                doc.setFontSize(12);
-                doc.setTextColor(30, 58, 95);
-                doc.text('Escala de Dor', 10, y);
-                y += 7;
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.text('Nível de dor: ' + nivelDorSelecionado + '/10', 10, y);
-                y += 10;
-            }
-            doc.save('Ficha_Avaliacao_' + (nomePaciente || 'Paciente') + '_' + (data || new Date().toISOString().split('T')[0]) + '.pdf');
-        }
-        
-        function enviarWhatsApp() {
-            const nomePaciente = document.getElementById('nomePaciente').value || 'Paciente';
-            const data = document.getElementById('dataAvaliacao').value || new Date().toLocaleDateString('pt-BR');
-            const nomeFisio = document.getElementById('nomeFisio').value || 'Fisioterapeuta';
-            const mensagem = '*Ficha de Avaliação - ASM Gestão Clínica*%0A%0A' +
-                           'Paciente: ' + nomePaciente + '%0A' +
-                           'Data: ' + data + '%0A' +
-                           'Fisioterapeuta: ' + nomeFisio + '%0A%0A' +
-                           'Avaliação realizada com sucesso!';
-            window.open('https://wa.me/?text=' + mensagem, '_blank');
+        function carregarDados() {
+            // Carregar dados do fisioterapeuta
+            const dadosFisio = JSON.parse(localStorage.getItem('asm_dados_fisio') || '{}');
+            if (dadosFisio.nomeFisio) document.getElementById('nomeFisio').value = dadosFisio.nomeFisio;
+            if (dadosFisio.crefito) document.getElementById('crefito').value = dadosFisio.crefito;
         }
         
         function coletarDados() {
@@ -1196,14 +1186,156 @@
                 diagnosticoExercicio: document.getElementById('diagnosticoExercicio').value,
                 testesNeuro: document.getElementById('testesNeuro').value,
                 objetivos: document.getElementById('objetivos').value,
+                assinatura: hasSignature ? assinaturaCanvas.toDataURL() : null,
                 dataCriacao: new Date().toISOString()
             };
+        }
+        
+        async function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const nomePaciente = document.getElementById('nomePaciente').value || 'Paciente';
+            const dataAvaliacao = document.getElementById('dataAvaliacao').value;
+            
+            // Cabeçalho
+            doc.setFillColor(30, 58, 95);
+            doc.rect(0, 0, 210, 35, 'F');
+            
+            doc.setTextColor(201, 162, 39);
+            doc.setFontSize(18);
+            doc.text('ASM Gestão Clínica', 105, 15, { align: 'center' });
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.text('Ficha de Avaliação Fisioterapêutica', 105, 25, { align: 'center' });
+            
+            let y = 45;
+            
+            // Profissional
+            doc.setTextColor(30, 58, 95);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('PROFISSIONAL', 10, y);
+            y += 7;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(`Nome: ${document.getElementById('nomeFisio').value || '_________________________________'}`, 10, y);
+            y += 6;
+            doc.text(`CREFITO: ${document.getElementById('crefito').value || '_________________________________'}`, 10, y);
+            y += 10;
+            
+            // Paciente
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(11);
+            doc.text('PACIENTE', 10, y);
+            y += 7;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(`Nome: ${nomePaciente}`, 10, y);
+            y += 6;
+            doc.text(`Idade: ${document.getElementById('idade').value || '_____'} anos`, 10, y);
+            y += 6;
+            doc.text(`Data: ${dataAvaliacao ? new Date(dataAvaliacao).toLocaleDateString('pt-BR') : '___/___/_____'}`, 10, y);
+            y += 6;
+            doc.text(`Profissão: ${document.getElementById('profissao').value || '_________________________________'}`, 10, y);
+            y += 10;
+            
+            // Queixa principal
+            const queixa = document.getElementById('queixaPrincipal').value;
+            if (queixa) {
+                if (y > 270) { doc.addPage(); y = 20; }
+                doc.setFont(undefined, 'bold');
+                doc.setFontSize(11);
+                doc.text('QUEIXA PRINCIPAL', 10, y);
+                y += 7;
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(10);
+                const linhas = doc.splitTextToSize(queixa, 190);
+                doc.text(linhas, 10, y);
+                y += linhas.length * 5 + 5;
+            }
+            
+            // Escala de dor
+            if (nivelDorSelecionado !== null) {
+                if (y > 270) { doc.addPage(); y = 20; }
+                doc.setFont(undefined, 'bold');
+                doc.setFontSize(11);
+                doc.text('ESCALA DE DOR', 10, y);
+                y += 7;
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(10);
+                doc.text(`Nível de dor: ${nivelDorSelecionado}/10`, 10, y);
+                y += 10;
+            }
+            
+            // Objetivos
+            const objetivos = document.getElementById('objetivos').value;
+            if (objetivos) {
+                if (y > 270) { doc.addPage(); y = 20; }
+                doc.setFont(undefined, 'bold');
+                doc.setFontSize(11);
+                doc.text('OBJETIVOS DO TRATAMENTO', 10, y);
+                y += 7;
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(10);
+                const linhas = doc.splitTextToSize(objetivos, 190);
+                doc.text(linhas, 10, y);
+                y += linhas.length * 5 + 5;
+            }
+            
+            // Assinatura
+            if (y > 250) { doc.addPage(); y = 20; }
+            y += 10;
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(11);
+            doc.text('ASSINATURA DO FISIOTERAPEUTA', 10, y);
+            y += 10;
+            
+            if (hasSignature) {
+                const imgData = assinaturaCanvas.toDataURL('image/png');
+                doc.addImage(imgData, 'PNG', 10, y, 80, 30);
+                y += 35;
+            } else {
+                doc.line(10, y, 90, y);
+                y += 5;
+            }
+            
+            // Rodapé
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('ASM Gestão Clínica -- Uso Licenciado', 105, 285, { align: 'center' });
+            doc.text('© ASM Gestão Clínica -- Dra. Andresa Augusto Nascimento | Uso licenciado ao comprador.', 105, 290, { align: 'center' });
+            doc.text('Proibida reprodução ou compartilhamento sem autorização.', 105, 295, { align: 'center' });
+            
+            doc.save(`Ficha_Avaliacao_${nomePaciente}.pdf`);
+            mostrarToast('📄 PDF gerado com sucesso!');
+        }
+        
+        function enviarWhatsApp() {
+            const nomePaciente = document.getElementById('nomePaciente').value || 'Paciente';
+            const data = document.getElementById('dataAvaliacao').value;
+            const nomeFisio = document.getElementById('nomeFisio').value || 'Fisioterapeuta';
+            
+            let mensagem = `*Ficha de Avaliação - ASM Gestão Clínica*%0A%0A`;
+            mensagem += `Paciente: ${nomePaciente}%0A`;
+            mensagem += `Data: ${data}%0A`;
+            mensagem += `Fisioterapeuta: ${nomeFisio}%0A%0A`;
+            mensagem += `Avaliação realizada com sucesso!`;
+            
+            window.open(`https://wa.me/?text=${mensagem}`, '_blank');
+        }
+        
+        function mostrarToast(mensagem) {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
         window.addEventListener('resize', function() {
             if (assinaturaCanvas) {
                 const container = assinaturaCanvas.parentElement;
-                assinaturaCanvas.width = container.offsetWidth;
+                assinaturaCanvas.width = container.offsetWidth - 4;
             }
         });
     </script>
