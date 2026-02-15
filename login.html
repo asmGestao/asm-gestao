@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso ASM</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #0b2c47, #0e3b5c);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 380px;
+      padding: 28px;
+      border-radius: 22px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+    }
+
+    .logo {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #caa24d, #f5e1a4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: #0b2c47;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #0b2c47;
+    }
+
+    p {
+      margin: 14px 0 22px;
+      font-size: 14px;
+      color: #5f6f7c;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 14px;
+      border: 1px solid #d5dde5;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, #0b2c47, #0e3b5c);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .erro {
+      display: none;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #c0392b;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <div class="logo">ASM</div>
+
+    <h1>Acesso restrito</h1>
+    <p>Digite a senha para acessar o sistema</p>
+
+    <input type="password" id="senha" placeholder="Senha de acesso">
+
+    <button onclick="entrar()">Entrar</button>
+
+    <div class="erro" id="erro">Senha incorreta</div>
+  </div>
+
+  <script>
+    function entrar() {
+      const senhaDigitada = document.getElementById("senha").value;
+      const senhaCorreta = "ASM197";
+
+      if (senhaDigitada === senhaCorreta) {
+        window.location.href = "sistema.html";
+      } else {
+        document.getElementById("erro").style.display = "block";
+      }
+    }
+  </script>
+
+</body>
+</html>
