@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCLE Tratamento - ASM Gestão Clínica</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; padding: 10px; min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #1e3a5f; color: white; padding: 25px; text-align: center; border-bottom: 5px solid #c9a227; }
+        .header h1 { font-family: 'Georgia', serif; font-size: 28px; letter-spacing: 3px; margin-bottom: 5px; }
+        .header p { color: #c9a227; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; }
+        .profissional { background: #f8f9fa; padding: 15px; text-align: center; border-bottom: 2px solid #dee2e6; }
+        .profissional input { border: none; border-bottom: 2px solid #1e3a5f; background: transparent; font-size: 15px; text-align: center; margin: 5px; padding: 5px; width: 220px; color: #1e3a5f; font-weight: bold; }
+        .content { padding: 30px; }
+        .titulo { text-align: center; margin: 25px 0; }
+        .titulo h2 { font-family: 'Georgia', serif; color: #1e3a5f; font-size: 20px; text-transform: uppercase; }
+        .titulo::after { content: ''; display: block; width: 80px; height: 3px; background: #c9a227; margin: 10px auto; }
+        .form-group { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1e3a5f; }
+        .form-group h3 { color: #1e3a5f; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-bottom: 1px solid #dee2e6; padding-bottom: 8px; }
+        .input-row { display: flex; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+        .input-row label { color: #1e3a5f; font-weight: bold; font-size: 11px; text-transform: uppercase; min-width: 150px; }
+        .input-row input { flex: 1; border: none; border-bottom: 2px solid #2c3e50; background: transparent; padding: 5px; font-size: 15px; min-width: 200px; }
+        .clausula { margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #dee2e6; }
+        .clausula-numero { color: #c9a227; font-weight: bold; font-size: 18px; margin-right: 10px; }
+        .clausula h4 { color: #1e3a5f; font-size: 13px; margin-bottom: 8px; }
+        .clausula p { font-size: 12px; line-height: 1.6; color: #555; text-align: justify; }
+        .checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; margin: 10px 0; }
+        .checkbox-item { display: flex; align-items: center; }
+        .checkbox-item input { width: 18px; height: 18px; margin-right: 5px; }
+        .assinatura { margin-top: 40px; text-align: center; }
+        .assinatura-line { border-top: 2px solid #2c3e50; display: inline-block; padding-top: 8px; width: 280px; margin-top: 40px; font-size: 11px; color: #666; }
+        .botoes { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; z-index: 1000; }
+        .btn { padding: 12px 20px; border: none; border-radius: 25px; font-size: 14px; cursor: pointer; font-weight: bold; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .btn-salvar { background: #1e3a5f; color: white; }
+        .btn-pdf { background: #c9a227; color: white; }
+        .btn-limpar { background: #dc3545; color: white; }
+        .saved-msg { position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 25px; display: none; font-weight: bold; z-index: 1001; }
+        @media print { .botoes, .saved-msg { display: none !important; } body { background: white; } .container { box-shadow: none; margin: 0; } }
+        @media (max-width: 600px) { .content { padding: 15px; } .header h1 { font-size: 22px; } .botoes { position: fixed; bottom: 10px; width: 95%; } .btn { padding: 10px 15px; font-size: 12px; } }
+    </style>
+</head>
+<body>
+    <div class="saved-msg" id="savedMsg">✓ Salvo!</div>
+    <div class="container" id="documento">
+        <div class="header">
+            <h1>ASM GESTÃO CLÍNICA</h1>
+            <p>Gestão Fisioterapêutica</p>
+        </div>
+        <div class="profissional">
+            <input type="text" id="profissional" placeholder="Nome do Profissional">
+            <input type="text" id="crefito" placeholder="CREFITO">
+        </div>
+        <div class="content">
+            <div class="titulo">
+                <h2>Termo de Consentimento Livre e Esclarecido<br><span style="font-size: 14px; color: #666; font-weight: normal;">Tratamento Fisioterapêutico</span></h2>
+            </div>
+            
+            <div class="form-group">
+                <h3>Identificação do Paciente</h3>
+                <div class="input-row"><label>Nome:</label><input type="text" id="nome" placeholder="Nome completo"></div>
+                <div class="input-row"><label>CPF:</label><input type="text" id="cpf" placeholder="000.000.000-00"></div>
+                <div class="input-row"><label>Data Nasc.:</label><input type="text" id="dataNasc" placeholder="DD/MM/AAAA"></div>
+                <div class="input-row"><label>Endereço:</label><input type="text" id="endereco" placeholder="Endereço completo"></div>
+                <div class="input-row"><label>Telefone:</label><input type="text" id="telefone" placeholder="(00) 00000-0000"></div>
+                <div class="input-row"><label>Responsável:</label><input type="text" id="responsavel" placeholder="Se menor de idade"></div>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">1)</span> FINALIDADE DO ATENDIMENTO</h4>
+                <p>Declaro que recebi informações claras sobre o atendimento fisioterapêutico, incluindo avaliação, objetivos, plano terapêutico, alternativas possíveis e o que se espera do processo de reabilitação.</p>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">2)</span> PROCEDIMENTOS E CONDUTAS</h4>
+                <p>Fui informado(a) de que poderão ser utilizados: exercícios terapêuticos, terapia manual, recursos eletrotermofototerapêuticos, treino funcional, orientações de autocuidado e outras condutas fisioterapêuticas.</p>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">3)</span> BENEFÍCIOS ESPERADOS</h4>
+                <p>Melhora de dor, função, mobilidade, controle motor, desempenho em atividades diárias e/ou prevenção de agravamentos.</p>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">4)</span> POSSÍVEIS DESCONFORTOS</h4>
+                <p>Podem ocorrer: dor muscular tardia, sensibilidade local, fadiga, tontura leve ou aumento temporário de sintomas.</p>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">5)</span> DIREITOS DO PACIENTE</h4>
+                <p>• Fazer perguntas e receber respostas<br>• Recusar ou interromper o atendimento a qualquer momento<br>• Receber informações sobre evolução<br>• Sigilo e confidencialidade</p>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">6)</span> CONSENTIMENTO</h4>
+                <p>Após ter lido e compreendido as informações acima, DECLARO que estou ciente e de acordo com a realização do atendimento fisioterapêutico.</p>
+                <div class="checkbox-group" style="margin-top: 15px;">
+                    <label class="checkbox-item"><input type="checkbox" id="concordo"> Concordo com todos os termos acima</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-row"><label>Local e Data:</label><input type="text" id="localData" placeholder="Cidade, DD/MM/AAAA"></div>
+            </div>
+
+            <div class="assinatura">
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                    <div class="assinatura-line" style="margin: 20px;">Assinatura do Paciente/Responsável</div>
+                    <div class="assinatura-line" style="margin: 20px;">Assinatura e Carimbo do Fisioterapeuta</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; font-size: 9px; color: #999; font-style: italic;">
+                ASM Gestão Clínica — Uso Licenciado | Dra. Andresa Augusto
+            </div>
+        </div>
+    </div>
+    
+    <div class="botoes">
+        <button class="btn btn-salvar" onclick="salvarDados()">💾 Salvar</button>
+        <button class="btn btn-pdf" onclick="gerarPDF()">📄 PDF</button>
+        <button class="btn btn-limpar" onclick="limparDados()">🗑️ Novo</button>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const campos = ['profissional', 'crefito', 'nome', 'cpf', 'dataNasc', 'endereco', 'telefone', 'responsavel', 'localData'];
+            campos.forEach(campo => {
+                const valor = localStorage.getItem('tcle_' + campo);
+                if (valor) document.getElementById(campo).value = valor;
+            });
+            if (localStorage.getItem('tcle_concordo') === 'true') document.getElementById('concordo').checked = true;
+        };
+        
+        function salvarDados() {
+            const campos = ['profissional', 'crefito', 'nome', 'cpf', 'dataNasc', 'endereco', 'telefone', 'responsavel', 'localData'];
+            campos.forEach(campo => {
+                localStorage.setItem('tcle_' + campo, document.getElementById(campo).value);
+            });
+            localStorage.setItem('tcle_concordo', document.getElementById('concordo').checked);
+            mostrarMsg('✓ Salvo!');
+        }
+        
+        function mostrarMsg(texto) {
+            const msg = document.getElementById('savedMsg');
+            msg.textContent = texto;
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 2000);
+        }
+        
+        function gerarPDF() {
+            mostrarMsg('📄 Preparando...');
+            salvarDados();
+            const botoes = document.querySelector('.botoes');
+            botoes.style.display = 'none';
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => {
+                    botoes.style.display = 'flex';
+                    mostrarMsg('✓ Use "Salvar em Arquivos"');
+                }, 1000);
+            }, 500);
+        }
+        
+        function limparDados() {
+            if (confirm('Limpar todos os dados?')) {
+                const campos = ['profissional', 'crefito', 'nome', 'cpf', 'dataNasc', 'endereco', 'telefone', 'responsavel', 'localData'];
+                campos.forEach(campo => {
+                    localStorage.removeItem('tcle_' + campo);
+                    document.getElementById(campo).value = '';
+                });
+                localStorage.removeItem('tcle_concordo');
+                document.getElementById('concordo').checked = false;
+                mostrarMsg('✓ Novo documento');
+            }
+        }
+        
+        setInterval(salvarDados, 30000);
+    </script>
+</body>
+</html>

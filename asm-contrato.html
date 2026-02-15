@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Contrato - ASM Gestão Clínica</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; padding: 10px; padding-bottom: 100px; min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #1e3a5f; color: white; padding: 25px; text-align: center; border-bottom: 5px solid #c9a227; }
+        .header h1 { font-family: 'Georgia', serif; font-size: 28px; letter-spacing: 3px; margin-bottom: 5px; }
+        .header p { color: #c9a227; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; }
+        .profissional { background: #f8f9fa; padding: 15px; text-align: center; border-bottom: 2px solid #dee2e6; }
+        .profissional input { border: none; border-bottom: 2px solid #1e3a5f; background: transparent; font-size: 15px; text-align: center; margin: 5px; padding: 5px; width: 220px; color: #1e3a5f; font-weight: bold; }
+        .content { padding: 30px; }
+        .titulo { text-align: center; margin: 25px 0; }
+        .titulo h2 { font-family: 'Georgia', serif; color: #1e3a5f; font-size: 20px; text-transform: uppercase; }
+        .titulo::after { content: ''; display: block; width: 80px; height: 3px; background: #c9a227; margin: 10px auto; }
+        .form-group { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1e3a5f; }
+        .form-group h3 { color: #1e3a5f; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-bottom: 1px solid #dee2e6; padding-bottom: 8px; }
+        .input-row { display: flex; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+        .input-row label { color: #1e3a5f; font-weight: bold; font-size: 11px; text-transform: uppercase; min-width: 180px; }
+        .input-row input { flex: 1; border: none; border-bottom: 2px solid #2c3e50; background: transparent; padding: 5px; font-size: 15px; min-width: 200px; }
+        .clausula { margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #dee2e6; }
+        .clausula-numero { color: #c9a227; font-weight: bold; font-size: 18px; margin-right: 10px; }
+        .clausula h4 { color: #1e3a5f; font-size: 13px; margin-bottom: 8px; }
+        .clausula p { font-size: 12px; line-height: 1.6; color: #555; text-align: justify; }
+        .checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; margin: 10px 0; }
+        .checkbox-item { display: flex; align-items: center; }
+        .checkbox-item input { width: 18px; height: 18px; margin-right: 5px; }
+        
+        /* ASSINATURAS */
+        .assinaturas-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
+        .assinatura-box { 
+            flex: 1; 
+            min-width: 300px;
+            text-align: center; 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 10px; 
+            border: 2px dashed #1e3a5f;
+        }
+        .assinatura-box h3 { 
+            color: #1e3a5f; 
+            font-size: 13px; 
+            margin-bottom: 10px; 
+            text-transform: uppercase;
+        }
+        .assinatura-box p { 
+            font-size: 11px; 
+            color: #666; 
+            margin-bottom: 10px;
+        }
+        .assinatura-canvas { 
+            background: white; 
+            border: 2px solid #dee2e6; 
+            border-radius: 8px; 
+            width: 100%; 
+            height: 120px; 
+            touch-action: none;
+            cursor: crosshair;
+        }
+        .assinatura-botoes { 
+            margin-top: 10px; 
+            display: flex; 
+            gap: 10px; 
+            justify-content: center;
+        }
+        .btn-assinatura { 
+            padding: 6px 12px; 
+            border: none; 
+            border-radius: 15px; 
+            font-size: 11px; 
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-limpar-ass { background: #dc3545; color: white; }
+        .btn-salvar-ass { background: #28a745; color: white; }
+        
+        .testemunhas { margin: 20px 0; padding: 15px; background: #fff3cd; border-radius: 8px; border: 1px solid #c9a227; }
+        .testemunhas h4 { color: #1e3a5f; font-size: 12px; margin-bottom: 10px; }
+        
+        .botoes { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; z-index: 1000; }
+        .btn { padding: 12px 20px; border: none; border-radius: 25px; font-size: 14px; cursor: pointer; font-weight: bold; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .btn-salvar { background: #1e3a5f; color: white; }
+        .btn-pdf { background: #c9a227; color: white; }
+        .btn-limpar { background: #dc3545; color: white; }
+        .saved-msg { position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 25px; display: none; font-weight: bold; z-index: 1001; }
+        
+        @media print { 
+            .botoes, .saved-msg, .assinatura-botoes { display: none !important; } 
+            body { background: white; } 
+            .container { box-shadow: none; margin: 0; } 
+            .assinatura-canvas { border: 1px solid #333; }
+        }
+        @media (max-width: 600px) { 
+            .content { padding: 15px; } 
+            .header h1 { font-size: 22px; } 
+            .botoes { position: fixed; bottom: 10px; width: 95%; } 
+            .btn { padding: 10px 15px; font-size: 12px; }
+            .assinatura-box { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="saved-msg" id="savedMsg">✓ Salvo!</div>
+    <div class="container" id="documento">
+        <div class="header">
+            <h1>ASM GESTÃO CLÍNICA</h1>
+            <p>Gestão Fisioterapêutica</p>
+        </div>
+        <div class="profissional">
+            <input type="text" id="profissional" placeholder="Nome do Profissional">
+            <input type="text" id="crefito" placeholder="CREFITO">
+        </div>
+        <div class="content">
+            <div class="titulo">
+                <h2>Contrato de Prestação de Serviços<br><span style="font-size: 14px; color: #666; font-weight: normal;">Fisioterapêuticos</span></h2>
+            </div>
+            
+            <div class="form-group">
+                <h3>1) Contratante (Paciente/Responsável)</h3>
+                <div class="input-row"><label>Nome:</label><input type="text" id="contratante" placeholder="Nome completo"></div>
+                <div class="input-row"><label>CPF:</label><input type="text" id="cpfContratante" placeholder="000.000.000-00"></div>
+                <div class="input-row"><label>RG:</label><input type="text" id="rg" placeholder="00.000.000-0"></div>
+                <div class="input-row"><label>Endereço:</label><input type="text" id="endereco" placeholder="Endereço completo"></div>
+                <div class="input-row"><label>Telefone:</label><input type="text" id="telefone" placeholder="(00) 00000-0000"></div>
+                <div class="input-row"><label>E-mail:</label><input type="text" id="email" placeholder="email@exemplo.com"></div>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">2)</span> OBJETO DO CONTRATO</h4>
+                <p>Prestação de serviços fisioterapêuticos mediante avaliação, elaboração de diagnóstico fisioterapêutico/funcional, plano terapêutico e execução de condutas compatíveis com as necessidades do caso.</p>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">3)</span> CONDIÇÃO CLÍNICA</h4>
+                <div class="input-row" style="margin-top: 10px;"><label>Queixa principal:</label><input type="text" id="queixa" placeholder="Descreva a queixa principal"></div>
+                <div class="input-row"><label>CID (se houver):</label><input type="text" id="cid" placeholder="Código CID"></div>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">4)</span> MODALIDADE E FREQUÊNCIA</h4>
+                <div class="checkbox-group" style="margin: 10px 0;">
+                    <label class="checkbox-item"><input type="checkbox" id="modalidadeClinica"> Clínica/Consultório</label>
+                    <label class="checkbox-item"><input type="checkbox" id="modalidadeDomiciliar"> Domiciliar</label>
+                    <label class="checkbox-item"><input type="checkbox" id="modalidadeOnline"> Online</label>
+                </div>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">5)</span> HONORÁRIOS E PAGAMENTO</h4>
+                <div class="input-row" style="margin-top: 10px;"><label>Valor por sessão:</label><input type="text" id="valorSessao" placeholder="R$ 0,00"></div>
+                <div class="input-row"><label>Valor pacote:</label><input type="text" id="valorPacote" placeholder="R$ 0,00 (___ sessões)"></div>
+                <div class="checkbox-group" style="margin: 10px 0;">
+                    <label class="checkbox-item"><input type="checkbox" id="pagPix"> Pix</label>
+                    <label class="checkbox-item"><input type="checkbox" id="pagDinheiro"> Dinheiro</label>
+                    <label class="checkbox-item"><input type="checkbox" id="pagCartao"> Cartão</label>
+                    <label class="checkbox-item"><input type="checkbox" id="pagTransferencia"> Transferência</label>
+                </div>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">6)</span> CANCELAMENTO E FALTAS</h4>
+                <div class="input-row" style="margin-top: 10px;"><label>Antecedência mínima:</label><input type="text" id="cancelamentoHoras" placeholder="___ horas"></div>
+                <div class="input-row"><label>Multa por falta:</label><input type="text" id="multa" placeholder="___% do valor"></div>
+            </div>
+
+            <div class="clausula">
+                <h4><span class="clausula-numero">7)</span> VIGÊNCIA E RESCISÃO</h4>
+                <div class="input-row" style="margin-top: 10px;"><label>Aviso prévio:</label><input type="text" id="vigencia" placeholder="___ dias"></div>
+                <p style="font-size: 11px; margin-top: 10px; color: #666;">Este contrato entra em vigor na data de assinatura e permanece válido enquanto houver prestação de serviços.</p>
+            </div>
+
+            <div class="form-group">
+                <div class="input-row"><label>Local e Data:</label><input type="text" id="localData" placeholder="Cidade, DD/MM/AAAA"></div>
+            </div>
+
+            <!-- DUAS ASSINATURAS -->
+            <div class="assinaturas-container">
+                <div class="assinatura-box">
+                    <h3>✍️ Assinatura do Contratante</h3>
+                    <p>Paciente/Responsável</p>
+                    <canvas id="canvasPaciente" class="assinatura-canvas"></canvas>
+                    <div class="assinatura-botoes">
+                        <button class="btn-assinatura btn-limpar-ass" onclick="limparAssinatura('paciente')">🗑️ Limpar</button>
+                        <button class="btn-assinatura btn-salvar-ass" onclick="salvarAssinatura('paciente')">💾 Salvar</button>
+                    </div>
+                </div>
+                
+                <div class="assinatura-box">
+                    <h3>✍️ Assinatura do Fisioterapeuta</h3>
+                    <p>Profissional</p>
+                    <canvas id="canvasProfissional" class="assinatura-canvas"></canvas>
+                    <div class="assinatura-botoes">
+                        <button class="btn-assinatura btn-limpar-ass" onclick="limparAssinatura('profissional')">🗑️ Limpar</button>
+                        <button class="btn-assinatura btn-salvar-ass" onclick="salvarAssinatura('profissional')">💾 Salvar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TESTEMUNHAS -->
+            <div class="testemunhas">
+                <h4>Testemunhas (opcional):</h4>
+                <div class="input-row"><label>Testemunha 1:</label><input type="text" id="testemunha1" placeholder="Nome e CPF"></div>
+                <div class="input-row"><label>Testemunha 2:</label><input type="text" id="testemunha2" placeholder="Nome e CPF"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; font-size: 9px; color: #999; font-style: italic;">
+                ASM Gestão Clínica — Uso Licenciado | Dra. Andresa Augusto
+            </div>
+        </div>
+    </div>
+    
+    <div class="botoes">
+        <button class="btn btn-salvar" onclick="salvarDados()">💾 Salvar</button>
+        <button class="btn btn-pdf" onclick="gerarPDF()">📄 PDF</button>
+        <button class="btn btn-limpar" onclick="limparDados()">🗑️ Novo</button>
+    </div>
+
+    <script>
+        // Sistema de Assinaturas (2 canvas)
+        const canvases = {
+            paciente: document.getElementById('canvasPaciente'),
+            profissional: document.getElementById('canvasProfissional')
+        };
+        
+        const ctxs = {
+            paciente: canvases.paciente.getContext('2d'),
+            profissional: canvases.profissional.getContext('2d')
+        };
+        
+        let isDrawing = { paciente: false, profissional: false };
+        let hasSignature = { paciente: false, profissional: false };
+        
+        function initCanvas(tipo) {
+            const canvas = canvases[tipo];
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctxs[tipo].strokeStyle = '#1e3a5f';
+            ctxs[tipo].lineWidth = 2;
+            ctxs[tipo].lineCap = 'round';
+            ctxs[tipo].lineJoin = 'round';
+        }
+        
+        window.addEventListener('load', () => {
+            initCanvas('paciente');
+            initCanvas('profissional');
+            carregarDados();
+        });
+        
+        window.addEventListener('resize', () => {
+            const sigPac = hasSignature.paciente ? canvases.paciente.toDataURL() : null;
+            const sigProf = hasSignature.profissional ? canvases.profissional.toDataURL() : null;
+            
+            initCanvas('paciente');
+            initCanvas('profissional');
+            
+            if (sigPac) {
+                const img = new Image();
+                img.onload = () => ctxs.paciente.drawImage(img, 0, 0);
+                img.src = sigPac;
+            }
+            if (sigProf) {
+                const img = new Image();
+                img.onload = () => ctxs.profissional.drawImage(img, 0, 0);
+                img.src = sigProf;
+            }
+        });
+        
+        function getPos(e, tipo) {
+            const canvas = canvases[tipo];
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+        
+        function setupCanvasEvents(tipo) {
+            const canvas = canvases[tipo];
+            
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing[tipo] = true;
+                const pos = getPos(e, tipo);
+                ctxs[tipo].beginPath();
+                ctxs[tipo].moveTo(pos.x, pos.y);
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing[tipo]) return;
+                const pos = getPos(e, tipo);
+                ctxs[tipo].lineTo(pos.x, pos.y);
+                ctxs[tipo].stroke();
+                hasSignature[tipo] = true;
+            });
+            
+            canvas.addEventListener('mouseup', () => isDrawing[tipo] = false);
+            canvas.addEventListener('mouseout', () => isDrawing[tipo] = false);
+            
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isDrawing[tipo] = true;
+                const pos = getPos(e, tipo);
+                ctxs[tipo].beginPath();
+                ctxs[tipo].moveTo(pos.x, pos.y);
+            }, {passive: false});
+            
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!isDrawing[tipo]) return;
+                const pos = getPos(e, tipo);
+                ctxs[tipo].lineTo(pos.x, pos.y);
+                ctxs[tipo].stroke();
+                hasSignature[tipo] = true;
+            }, {passive: false});
+            
+            canvas.addEventListener('touchend', () => isDrawing[tipo] = false);
+        }
+        
+        setupCanvasEvents('paciente');
+        setupCanvasEvents('profissional');
+        
+        function limparAssinatura(tipo) {
+            const canvas = canvases[tipo];
+            const ctx = ctxs[tipo];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSignature[tipo] = false;
+            localStorage.removeItem('contrato_assinatura_' + tipo);
+        }
+        
+        function salvarAssinatura(tipo) {
+            if (!hasSignature[tipo]) {
+                alert('Faça a assinatura primeiro!');
+                return;
+            }
+            const dataURL = canvases[tipo].toDataURL('image/png');
+            localStorage.setItem('contrato_assinatura_' + tipo, dataURL);
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Salvo!';
+            btn.style.background = '#1e3a5f';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#28a745';
+            }, 1500);
+        }
+        
+        function carregarDados() {
+            const campos = ['profissional', 'crefito', 'contratante', 'cpfContratante', 'rg', 'endereco', 'telefone', 'email', 'queixa', 'cid', 'valorSessao', 'valorPacote', 'cancelamentoHoras', 'multa', 'vigencia', 'localData', 'testemunha1', 'testemunha2'];
+            campos.forEach(campo => {
+                const valor = localStorage.getItem('contrato_' + campo);
+                if (valor) document.getElementById(campo).value = valor;
+            });
+            
+            const checks = ['modalidadeClinica', 'modalidadeDomiciliar', 'modalidadeOnline', 'pagPix', 'pagDinheiro', 'pagCartao', 'pagTransferencia'];
+            checks.forEach(check => {
+                if (localStorage.getItem('contrato_' + check) === 'true') {
+                    document.getElementById(check).checked = true;
+                }
+            });
+            
+            ['paciente', 'profissional'].forEach(tipo => {
+                const assinatura = localStorage.getItem('contrato_assinatura_' + tipo);
+                if (assinatura) {
+                    const img = new Image();
+                    img.onload = () => {
+                        ctxs[tipo].drawImage(img, 0, 0);
+                        hasSignature[tipo] = true;
+                    };
+                    img.src = assinatura;
+                }
+            });
+        }
+        
+        function salvarDados() {
+            const campos = ['profissional', 'crefito', 'contratante', 'cpfContratante', 'rg', 'endereco', 'telefone', 'email', 'queixa', 'cid', 'valorSessao', 'valorPacote', 'cancelamentoHoras', 'multa', 'vigencia', 'localData', 'testemunha1', 'testemunha2'];
+            campos.forEach(campo => {
+                localStorage.setItem('contrato_' + campo, document.getElementById(campo).value);
+            });
+            
+            const checks = ['modalidadeClinica', 'modalidadeDomiciliar', 'modalidadeOnline', 'pagPix', 'pagDinheiro', 'pagCartao', 'pagTransferencia'];
+            checks.forEach(check => {
+                localStorage.setItem('contrato_' + check, document.getElementById(check).checked);
+            });
+            
+            if (hasSignature.paciente) salvarAssinatura('paciente');
+            if (hasSignature.profissional) salvarAssinatura('profissional');
+            
+            mostrarMsg('✓ Salvo!');
+        }
+        
+        function mostrarMsg(texto) {
+            const msg = document.getElementById('savedMsg');
+            msg.textContent = texto;
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 2000);
+        }
+        
+        function gerarPDF() {
+            mostrarMsg('📄 Preparando...');
+            salvarDados();
+            const botoes = document.querySelector('.botoes');
+            const assBotoes = document.querySelectorAll('.assinatura-botoes');
+            botoes.style.display = 'none';
+            assBotoes.forEach(b => b.style.display = 'none');
+            
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => {
+                    botoes.style.display = 'flex';
+                    assBotoes.forEach(b => b.style.display = 'flex');
+                    mostrarMsg('✓ Use "Salvar em Arquivos"');
+                }, 1000);
+            }, 500);
+        }
+        
+        function limparDados() {
+            if (confirm('Limpar todos os dados?')) {
+                const campos = ['profissional', 'crefito', 'contratante', 'cpfContratante', 'rg', 'endereco', 'telefone', 'email', 'queixa', 'cid', 'valorSessao', 'valorPacote', 'cancelamentoHoras', 'multa', 'vigencia', 'localData', 'testemunha1', 'testemunha2'];
+                campos.forEach(campo => {
+                    localStorage.removeItem('contrato_' + campo);
+                    document.getElementById(campo).value = '';
+                });
+                
+                const checks = ['modalidadeClinica', 'modalidadeDomiciliar', 'modalidadeOnline', 'pagPix', 'pagDinheiro', 'pagCartao', 'pagTransferencia'];
+                checks.forEach(check => {
+                    localStorage.removeItem('contrato_' + check);
+                    document.getElementById(check).checked = false;
+                });
+                
+                limparAssinatura('paciente');
+                limparAssinatura('profissional');
+                
+                mostrarMsg('✓ Novo documento');
+            }
+        }
+        
+        setInterval(salvarDados, 30000);
+    </script>
+</body>
+</html>

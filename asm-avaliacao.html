@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ficha de Avaliação - ASM Gestão Clínica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            color: #d4af37;
+        }
+        
+        .fisioterapeuta-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid #1e3a5f;
+        }
+        
+        .fisioterapeuta-info h3 {
+            color: #1e3a5f;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .fisioterapeuta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 10px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e3a5f;
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        }
+        
+        .section {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-title {
+            color: #1e3a5f;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #d4af37;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #d4af37;
+            border-radius: 2px;
+        }
+        
+        .dados-paciente {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .escala-dor {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        
+        .escala-dor h4 {
+            color: #1e3a5f;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .escala-numeros {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .numero-dor {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            font-size: 0.9rem;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        
+        .numero-dor:active {
+            transform: scale(0.95);
+        }
+        
+        .numero-dor.selected {
+            background: #1e3a5f;
+            color: white;
+            border-color: #1e3a5f;
+            transform: scale(1.1);
+        }
+        
+        .numero-dor.dor-leve.selected { background: #4caf50; border-color: #4caf50; }
+        .numero-dor.dor-media.selected { background: #ff9800; border-color: #ff9800; }
+        .numero-dor.dor-intensa.selected { background: #f44336; border-color: #f44336; }
+        
+        .escala-linha {
+            height: 4px;
+            background: linear-gradient(to right, #4caf50 0%, #ff9800 50%, #f44336 100%);
+            border-radius: 2px;
+            margin: 0 17px;
+        }
+        
+        .escala-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        .textarea-group {
+            margin-bottom: 15px;
+        }
+        
+        .textarea-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #1e3a5f;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .textarea-group textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .textarea-group textarea:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #1e3a5f;
+            cursor: pointer;
+        }
+        
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .estrela-dor-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        
+        .estrela-dor-container h4 {
+            color: #1e3a5f;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .regioes-dor {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .regiao-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .regiao-item h5 {
+            color: #1e3a5f;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .movimentos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .movimento-item {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .movimento-item h6 {
+            color: #333;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .movimento-botoes {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-dor {
+            flex: 1;
+            padding: 10px 5px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        
+        .btn-dor:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-dor.selected-com-dor {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+        
+        .btn-dor.selected-sem-dor {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+        
+        .captores-grid {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .captor-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .captor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .captor-nome {
+            font-weight: 600;
+            color: #1e3a5f;
+            font-size: 0.95rem;
+        }
+        
+        .captor-botoes {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-captor {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        
+        .btn-captor:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-captor.selected-positivo {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+        
+        .btn-captor.selected-negativo {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+        
+        .captor-obs {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+        
+        .assinatura-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .assinatura-section h4 {
+            color: #1e3a5f;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .canvas-container {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #assinaturaCanvas {
+            width: 100%;
+            height: 150px;
+            display: block;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        
+        .assinatura-botoes {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-assinatura {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-limpar {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-limpar:active {
+            background: #d32f2f;
+        }
+        
+        .acoes-container {
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-acao {
+            flex: 1;
+            min-width: 100px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .btn-acao:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn-pdf {
+            background: #1e3a5f;
+            color: white;
+        }
+        
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        
+        .btn-salvar {
+            background: #d4af37;
+            color: white;
+        }
+        
+        @media (max-width: 600px) {
+            .dados-paciente {
+                grid-template-columns: 1fr;
+            }
+            
+            .fisioterapeuta-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .movimentos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .escala-numeros {
+                justify-content: center;
+            }
+            
+            .numero-dor {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ficha de Avaliação</h1>
+            <div class="subtitle">ASM Gestão Clínica</div>
+        </div>
+        
+        <div class="fisioterapeuta-info">
+            <h3>Dados do Profissional</h3>
+            <div class="fisioterapeuta-row">
+                <div class="input-group">
+                    <label>Fisioterapeuta</label>
+                    <input type="text" id="nomeFisio" placeholder="Nome completo">
+                </div>
+                <div class="input-group">
+                    <label>CREFITO</label>
+                    <input type="text" id="crefito" placeholder="Nº do CREFITO">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Dados do Paciente</div>
+            <div class="dados-paciente">
+                <div class="input-group full-width">
+                    <label>Nome</label>
+                    <input type="text" id="nomePaciente" placeholder="Nome completo do paciente">
+                </div>
+                <div class="input-group">
+                    <label>Idade</label>
+                    <input type="number" id="idade" placeholder="Anos">
+                </div>
+                <div class="input-group">
+                    <label>Data da Avaliação</label>
+                    <input type="date" id="dataAvaliacao">
+                </div>
+                <div class="input-group full-width">
+                    <label>Profissão</label>
+                    <input type="text" id="profissao" placeholder="Profissão do paciente">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Queixa Principal</div>
+            <div class="textarea-group">
+                <textarea id="queixaPrincipal" placeholder="Descreva a queixa principal do paciente..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Evolução dos Sintomas</div>
+            <div class="textarea-group">
+                <label>Como começou?</label>
+                <textarea id="comoComecou" placeholder="Descreva como os sintomas iniciaram..."></textarea>
+            </div>
+            <div class="textarea-group">
+                <label>Quando começou?</label>
+                <textarea id="quandoComecou" placeholder="Data/Período de início dos sintomas..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Escala Numérica Verbal da Dor</div>
+            <div class="escala-dor">
+                <h4>Toque no número correspondente à dor (0 a 10)</h4>
+                <div class="escala-numeros">
+                    <button type="button" class="numero-dor dor-leve" data-valor="0" onclick="selecionarDor(this)">0</button>
+                    <button type="button" class="numero-dor dor-leve" data-valor="1" onclick="selecionarDor(this)">1</button>
+                    <button type="button" class="numero-dor dor-leve" data-valor="2" onclick="selecionarDor(this)">2</button>
+                    <button type="button" class="numero-dor dor-leve" data-valor="3" onclick="selecionarDor(this)">3</button>
+                    <button type="button" class="numero-dor dor-media" data-valor="4" onclick="selecionarDor(this)">4</button>
+                    <button type="button" class="numero-dor dor-media" data-valor="5" onclick="selecionarDor(this)">5</button>
+                    <button type="button" class="numero-dor dor-media" data-valor="6" onclick="selecionarDor(this)">6</button>
+                    <button type="button" class="numero-dor dor-intensa" data-valor="7" onclick="selecionarDor(this)">7</button>
+                    <button type="button" class="numero-dor dor-intensa" data-valor="8" onclick="selecionarDor(this)">8</button>
+                    <button type="button" class="numero-dor dor-intensa" data-valor="9" onclick="selecionarDor(this)">9</button>
+                    <button type="button" class="numero-dor dor-intensa" data-valor="10" onclick="selecionarDor(this)">10</button>
+                </div>
+                <div class="escala-linha"></div>
+                <div class="escala-labels">
+                    <span>Sem dor</span>
+                    <span>Dor leve</span>
+                    <span>Dor moderada</span>
+                    <span>Dor intensa</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Extensão da Dor</div>
+            <div class="textarea-group">
+                <textarea id="extensaoDor" placeholder="Descreva a extensão da dor..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Tratamentos Anteriores</div>
+            <div class="textarea-group">
+                <label>Medicação</label>
+                <textarea id="medicacao" placeholder="Medicações em uso..."></textarea>
+            </div>
+            <div class="textarea-group">
+                <label>Cirurgias</label>
+                <textarea id="cirurgias" placeholder="Histórico de cirurgias..."></textarea>
+            </div>
+            <div class="textarea-group">
+                <label>Traumas</label>
+                <textarea id="traumas" placeholder="Histórico de traumas..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Características da Dor</div>
+            <div class="textarea-group">
+                <label>Frequência da dor</label>
+                <textarea id="frequenciaDor" placeholder="Constante, intermitente, etc..."></textarea>
+            </div>
+            <div class="textarea-group">
+                <label>O que piora a dor?</label>
+                <textarea id="pioraDor" placeholder="Fatores que agravam a dor..."></textarea>
+            </div>
+            <div class="textarea-group">
+                <label>O que melhora a dor?</label>
+                <textarea id="melhoraDor" placeholder="Fatores que aliviam a dor..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Questões Viscerais</div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="acordaDor">
+                    <label for="acordaDor">Acorda com dor?</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="dormeDor">
+                    <label for="dormeDor">Dorme com dor?</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="dormeBem">
+                    <label for="dormeBem">Dorme bem?</label>
+                </div>
+            </div>
+            <div class="textarea-group">
+                <label>Posição de dormir</label>
+                <textarea id="posicaoDormir" placeholder="Posição habitual de sono..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Contra-indicação / Exames de Imagem</div>
+            <div class="textarea-group">
+                <textarea id="contraindicacao" placeholder="Contra-indicações e exames de imagem..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Condições Gerais</div>
+            <div class="textarea-group">
+                <label>Alimentação</label>
+                <textarea id="alimentacao" placeholder="Hábitos alimentares..."></textarea>
+            </div>
+            <div class="textarea-group">
+                <label>Atividade Física</label>
+                <textarea id="atividadeFisica" placeholder="Prática de atividades físicas..."></textarea>
+            </div>
+            <div class="textarea-group">
+                <label>Emocional</label>
+                <textarea id="emocional" placeholder="Aspectos emocionais..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Inspeção</div>
+            <div class="textarea-group">
+                <label>Inspeção Estática</label>
+                <textarea id="inspecaoEstatica" placeholder="Observações da inspeção estática..."></textarea>
+            </div>
+            <div class="textarea-group">
+                <label>Inspeção Dinâmica</label>
+                <textarea id="inspecaoDinamica" placeholder="Observações da inspeção dinâmica..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Estrela da Dor</div>
+            <div class="estrela-dor-container">
+                <h4>Avaliação dos Movimentos (Toque nos botões)</h4>
+                <div class="regioes-dor">
+                    <div class="regiao-item">
+                        <h5>Região Lombar</h5>
+                        <div class="movimentos-grid">
+                            <div class="movimento-item">
+                                <h6>Flexão (F)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-flexao')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-flexao')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Extensão (E)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-extensao')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-extensao')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Incl. Esq (Se)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-se')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-se')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Incl. Dir (Sd)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-sd')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-sd')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Rotação Esq (Re)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-re')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-re')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Rotação Dir (Rd)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-rd')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'lombar-rd')">Sem dor</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="regiao-item">
+                        <h5>Região Torácica</h5>
+                        <div class="movimentos-grid">
+                            <div class="movimento-item">
+                                <h6>Flexão (F)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-flexao')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-flexao')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Extensão (E)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-extensao')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-extensao')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Incl. Esq (Se)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-se')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-se')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Incl. Dir (Sd)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-sd')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-sd')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Rotação Esq (Re)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-re')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-re')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Rotação Dir (Rd)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-rd')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'toracica-rd')">Sem dor</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="regiao-item">
+                        <h5>Região Cervical</h5>
+                        <div class="movimentos-grid">
+                            <div class="movimento-item">
+                                <h6>Flexão (F)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-flexao')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-flexao')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Extensão (E)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-extensao')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-extensao')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Incl. Esq (Se)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-se')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-se')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Incl. Dir (Sd)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-sd')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-sd')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Rotação Esq (Re)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-re')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-re')">Sem dor</button>
+                                </div>
+                            </div>
+                            <div class="movimento-item">
+                                <h6>Rotação Dir (Rd)</h6>
+                                <div class="movimento-botoes">
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-rd')">Com dor</button>
+                                    <button type="button" class="btn-dor" onclick="toggleDor(this, 'cervical-rd')">Sem dor</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Diagnóstico por Exercício Repetitivo</div>
+            <div class="textarea-group">
+                <textarea id="diagnosticoExercicio" placeholder="Resultados dos testes de exercício repetitivo..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Captores Posturais</div>
+            <div class="captores-grid">
+                <div class="captor-item">
+                    <div class="captor-header">
+                        <span class="captor-nome">Olho</span>
+                        <div class="captor-botoes">
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'positivo')">Positivo</button>
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'negativo')">Negativo</button>
+                        </div>
+                    </div>
+                    <input type="text" class="captor-obs" placeholder="Observações...">
+                </div>
+                
+                <div class="captor-item">
+                    <div class="captor-header">
+                        <span class="captor-nome">ATM</span>
+                        <div class="captor-botoes">
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'positivo')">Positivo</button>
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'negativo')">Negativo</button>
+                        </div>
+                    </div>
+                    <input type="text" class="captor-obs" placeholder="Observações...">
+                </div>
+                
+                <div class="captor-item">
+                    <div class="captor-header">
+                        <span class="captor-nome">Pé</span>
+                        <div class="captor-botoes">
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'positivo')">Positivo</button>
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'negativo')">Negativo</button>
+                        </div>
+                    </div>
+                    <input type="text" class="captor-obs" placeholder="Observações...">
+                </div>
+                
+                <div class="captor-item">
+                    <div class="captor-header">
+                        <span class="captor-nome">Cicatrizes</span>
+                        <div class="captor-botoes">
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'positivo')">Positivo</button>
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'negativo')">Negativo</button>
+                        </div>
+                    </div>
+                    <input type="text" class="captor-obs" placeholder="Observações...">
+                </div>
+                
+                <div class="captor-item">
+                    <div class="captor-header">
+                        <span class="captor-nome">Vísceras</span>
+                        <div class="captor-botoes">
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'positivo')">Positivo</button>
+                            <button type="button" class="btn-captor" onclick="toggleCaptor(this, 'negativo')">Negativo</button>
+                        </div>
+                    </div>
+                    <input type="text" class="captor-obs" placeholder="Observações...">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Testes Neurológicos e Ortopédicos</div>
+            <div class="textarea-group">
+                <textarea id="testesNeuro" placeholder="Descreva os testes realizados e seus resultados..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Objetivos do Tratamento</div>
+            <div class="textarea-group">
+                <textarea id="objetivos" placeholder="Objetivos terapêuticos estabelecidos..."></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Assinatura Digital</div>
+            <div class="assinatura-section">
+                <h4>Assine com o dedo na tela abaixo:</h4>
+                <div class="canvas-container">
+                    <canvas id="assinaturaCanvas"></canvas>
+                </div>
+                <div class="assinatura-botoes">
+                    <button type="button" class="btn-assinatura btn-limpar" onclick="limparAssinatura()">Limpar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="acoes-container">
+            <button type="button" class="btn-acao btn-salvar" onclick="salvarFicha()" title="Salvar">💾</button>
+            <button type="button" class="btn-acao btn-pdf" onclick="gerarPDF()" title="Gerar PDF">📄</button>
+            <button type="button" class="btn-acao btn-whatsapp" onclick="enviarWhatsApp()" title="Enviar WhatsApp">💬</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        let nivelDorSelecionado = null;
+        let assinaturaCanvas, assinaturaCtx;
+        let isDrawing = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initCanvas();
+            document.getElementById('dataAvaliacao').valueAsDate = new Date();
+        });
+        
+        function selecionarDor(elemento) {
+            document.querySelectorAll('.numero-dor').forEach(function(el) {
+                el.classList.remove('selected');
+            });
+            elemento.classList.add('selected');
+            nivelDorSelecionado = elemento.getAttribute('data-valor');
+        }
+        
+        function toggleDor(botao, grupo) {
+            const container = botao.parentElement;
+            const botoes = container.querySelectorAll('.btn-dor');
+            botoes.forEach(function(btn) {
+                btn.classList.remove('selected-com-dor', 'selected-sem-dor');
+            });
+            if (botao.textContent.includes('Com')) {
+                botao.classList.add('selected-com-dor');
+            } else {
+                botao.classList.add('selected-sem-dor');
+            }
+        }
+        
+        function toggleCaptor(botao, tipo) {
+            const container = botao.parentElement;
+            const botoes = container.querySelectorAll('.btn-captor');
+            botoes.forEach(function(btn) {
+                btn.classList.remove('selected-positivo', 'selected-negativo');
+            });
+            if (tipo === 'positivo') {
+                botao.classList.add('selected-positivo');
+            } else {
+                botao.classList.add('selected-negativo');
+            }
+        }
+        
+        function initCanvas() {
+            assinaturaCanvas = document.getElementById('assinaturaCanvas');
+            assinaturaCtx = assinaturaCanvas.getContext('2d');
+            const container = assinaturaCanvas.parentElement;
+            assinaturaCanvas.width = container.offsetWidth;
+            assinaturaCanvas.height = 150;
+            assinaturaCtx.strokeStyle = '#1e3a5f';
+            assinaturaCtx.lineWidth = 2;
+            assinaturaCtx.lineCap = 'round';
+            assinaturaCtx.lineJoin = 'round';
+            assinaturaCanvas.addEventListener('mousedown', startDrawing);
+            assinaturaCanvas.addEventListener('mousemove', draw);
+            assinaturaCanvas.addEventListener('mouseup', stopDrawing);
+            assinaturaCanvas.addEventListener('mouseout', stopDrawing);
+            assinaturaCanvas.addEventListener('touchstart', handleTouch, {passive: false});
+            assinaturaCanvas.addEventListener('touchmove', handleTouch, {passive: false});
+            assinaturaCanvas.addEventListener('touchend', stopDrawing);
+        }
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = assinaturaCanvas.getBoundingClientRect();
+            assinaturaCtx.beginPath();
+            assinaturaCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = assinaturaCanvas.getBoundingClientRect();
+            assinaturaCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            assinaturaCtx.stroke();
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = assinaturaCanvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            if (e.type === 'touchstart') {
+                isDrawing = true;
+                assinaturaCtx.beginPath();
+                assinaturaCtx.moveTo(x, y);
+            } else if (e.type === 'touchmove' && isDrawing) {
+                assinaturaCtx.lineTo(x, y);
+                assinaturaCtx.stroke();
+            }
+        }
+        
+        function limparAssinatura() {
+            assinaturaCtx.clearRect(0, 0, assinaturaCanvas.width, assinaturaCanvas.height);
+        }
+        
+        function salvarFicha() {
+            const dados = coletarDados();
+            localStorage.setItem('fichaAvaliacao_' + Date.now(), JSON.stringify(dados));
+            alert('Ficha salva com sucesso!');
+        }
+        
+        function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(20);
+            doc.setTextColor(30, 58, 95);
+            doc.text('Ficha de Avaliação', 105, 20, { align: 'center' });
+            doc.setFontSize(12);
+            doc.setTextColor(212, 175, 55);
+            doc.text('ASM Gestão Clínica', 105, 28, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            let y = 40;
+            const nomeFisio = document.getElementById('nomeFisio').value;
+            const crefito = document.getElementById('crefito').value;
+            if (nomeFisio) {
+                doc.text('Fisioterapeuta: ' + nomeFisio, 10, y);
+                y += 7;
+            }
+            if (crefito) {
+                doc.text('CREFITO: ' + crefito, 10, y);
+                y += 10;
+            }
+            const nomePaciente = document.getElementById('nomePaciente').value;
+            const idade = document.getElementById('idade').value;
+            const data = document.getElementById('dataAvaliacao').value;
+            if (nomePaciente || idade || data) {
+                doc.setFontSize(12);
+                doc.setTextColor(30, 58, 95);
+                doc.text('Dados do Paciente', 10, y);
+                y += 7;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                if (nomePaciente) doc.text('Nome: ' + nomePaciente, 10, y);
+                y += 7;
+                if (idade) doc.text('Idade: ' + idade + ' anos', 10, y);
+                y += 7;
+                if (data) doc.text('Data: ' + data, 10, y);
+                y += 10;
+            }
+            const queixa = document.getElementById('queixaPrincipal').value;
+            if (queixa) {
+                doc.setFontSize(12);
+                doc.setTextColor(30, 58, 95);
+                doc.text('Queixa Principal', 10, y);
+                y += 7;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                const linhas = doc.splitTextToSize(queixa, 190);
+                doc.text(linhas, 10, y);
+                y += linhas.length * 5 + 5;
+            }
+            if (nivelDorSelecionado !== null) {
+                doc.setFontSize(12);
+                doc.setTextColor(30, 58, 95);
+                doc.text('Escala de Dor', 10, y);
+                y += 7;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text('Nível de dor: ' + nivelDorSelecionado + '/10', 10, y);
+                y += 10;
+            }
+            doc.save('Ficha_Avaliacao_' + (nomePaciente || 'Paciente') + '_' + (data || new Date().toISOString().split('T')[0]) + '.pdf');
+        }
+        
+        function enviarWhatsApp() {
+            const nomePaciente = document.getElementById('nomePaciente').value || 'Paciente';
+            const data = document.getElementById('dataAvaliacao').value || new Date().toLocaleDateString('pt-BR');
+            const nomeFisio = document.getElementById('nomeFisio').value || 'Fisioterapeuta';
+            const mensagem = '*Ficha de Avaliação - ASM Gestão Clínica*%0A%0A' +
+                           'Paciente: ' + nomePaciente + '%0A' +
+                           'Data: ' + data + '%0A' +
+                           'Fisioterapeuta: ' + nomeFisio + '%0A%0A' +
+                           'Avaliação realizada com sucesso!';
+            window.open('https://wa.me/?text=' + mensagem, '_blank');
+        }
+        
+        function coletarDados() {
+            return {
+                fisioterapeuta: {
+                    nome: document.getElementById('nomeFisio').value,
+                    crefito: document.getElementById('crefito').value
+                },
+                paciente: {
+                    nome: document.getElementById('nomePaciente').value,
+                    idade: document.getElementById('idade').value,
+                    data: document.getElementById('dataAvaliacao').value,
+                    profissao: document.getElementById('profissao').value
+                },
+                queixaPrincipal: document.getElementById('queixaPrincipal').value,
+                comoComecou: document.getElementById('comoComecou').value,
+                quandoComecou: document.getElementById('quandoComecou').value,
+                nivelDor: nivelDorSelecionado,
+                extensaoDor: document.getElementById('extensaoDor').value,
+                medicacao: document.getElementById('medicacao').value,
+                cirurgias: document.getElementById('cirurgias').value,
+                traumas: document.getElementById('traumas').value,
+                frequenciaDor: document.getElementById('frequenciaDor').value,
+                pioraDor: document.getElementById('pioraDor').value,
+                melhoraDor: document.getElementById('melhoraDor').value,
+                acordaDor: document.getElementById('acordaDor').checked,
+                dormeDor: document.getElementById('dormeDor').checked,
+                dormeBem: document.getElementById('dormeBem').checked,
+                posicaoDormir: document.getElementById('posicaoDormir').value,
+                contraindicacao: document.getElementById('contraindicacao').value,
+                alimentacao: document.getElementById('alimentacao').value,
+                atividadeFisica: document.getElementById('atividadeFisica').value,
+                emocional: document.getElementById('emocional').value,
+                inspecaoEstatica: document.getElementById('inspecaoEstatica').value,
+                inspecaoDinamica: document.getElementById('inspecaoDinamica').value,
+                diagnosticoExercicio: document.getElementById('diagnosticoExercicio').value,
+                testesNeuro: document.getElementById('testesNeuro').value,
+                objetivos: document.getElementById('objetivos').value,
+                dataCriacao: new Date().toISOString()
+            };
+        }
+        
+        window.addEventListener('resize', function() {
+            if (assinaturaCanvas) {
+                const container = assinaturaCanvas.parentElement;
+                assinaturaCanvas.width = container.offsetWidth;
+            }
+        });
+    </script>
+</body>
+</html>

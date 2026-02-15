@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3a5f">
+    <title>ASM TCLE Teleatendimento</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --azul-marinho: #1e3a5f;
+            --dourado: #c9a227;
+            --cinza-claro: #f5f5f5;
+            --branco: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--azul-marinho) 0%, #2c4a6e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: var(--branco);
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .header h2 {
+            font-size: 1rem;
+            color: var(--dourado);
+            font-weight: normal;
+        }
+        
+        .form-card {
+            background: var(--branco);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        
+        .form-title {
+            color: var(--azul-marinho);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--dourado);
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--azul-marinho);
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--dourado);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
+        }
+        
+        .doc-preview {
+            background: var(--cinza-claro);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--dourado);
+        }
+        
+        .doc-preview h3 {
+            color: var(--azul-marinho);
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        
+        .doc-preview p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 10px;
+        }
+        
+        .signature-area {
+            background: var(--branco);
+            border: 2px dashed var(--azul-marinho);
+            border-radius: 10px;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .signature-pad {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+            touch-action: none;
+            display: block;
+        }
+        
+        .signature-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #999;
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--azul-marinho), #2c4a6e);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--dourado), #d4af37);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.75rem;
+            margin-top: 30px;
+            padding: 20px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 9999;
+            font-size: 0.9rem;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 ASM Gestão Clínica</h1>
+            <h2>Termo de Consentimento para Teleatendimento</h2>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">👤 Identificação das Partes</div>
+            
+            <div class="form-group">
+                <label class="form-label">Paciente/Responsável</label>
+                <input type="text" class="form-input" id="paciente" placeholder="Nome completo do paciente">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">CPF</label>
+                <input type="text" class="form-input" id="cpf" placeholder="000.000.000-00">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Fisioterapeuta</label>
+                <input type="text" class="form-input" id="fisio" value="Dra. Andresa Augusto">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">CREFITO</label>
+                <input type="text" class="form-input" id="crefito" placeholder="Número do CREFITO">
+            </div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">📋 Termo de Consentimento</div>
+            
+            <div class="doc-preview">
+                <h3>TERMO DE CONSENTIMENTO PARA TELEATENDIMENTO FISIOTERAPÊUTICO</h3>
+                
+                <p><strong>1) IDENTIFICAÇÃO DAS PARTES</strong></p>
+                <p>Paciente/Responsável: <span id="preview_paciente" style="border-bottom: 1px solid #666; min-width: 200px; display: inline-block;">____________________</span></p>
+                <p>CPF: <span id="preview_cpf">____________________</span></p>
+                <p>Fisioterapeuta: <span id="preview_fisio">Dra. Andresa Augusto</span></p>
+                <p>CREFITO: <span id="preview_crefito">____________________</span></p>
+                
+                <p style="margin-top: 15px;"><strong>2) OBJETO DO CONSENTIMENTO</strong></p>
+                <p>Consentimento para realização de atendimento fisioterapêutico na modalidade de teleatendimento.</p>
+                
+                <p style="margin-top: 15px;"><strong>3) ESCLARECIMENTOS E LIMITAÇÕES</strong></p>
+                <p>O atendimento remoto possui limitações técnicas e não substitui integralmente o atendimento presencial.</p>
+                
+                <p style="margin-top: 15px;"><strong>4) DECLARAÇÃO DE CONSENTIMENTO</strong></p>
+                <p>Declaro que estou ciente e autorizo, de forma livre e esclarecida, a realização do teleatendimento fisioterapêutico.</p>
+                
+                <p style="margin-top: 15px;"><strong>5) ENCERRAMENTO</strong></p>
+                <p>Local e data: <span id="preview_local">____________________</span>, <span id="preview_data">___/___/_____</span></p>
+                
+                <div style="margin-top: 30px; display: flex; justify-content: space-between; gap: 40px;">
+                    <div style="flex: 1; text-align: center;">
+                        <div style="border-top: 1px solid #333; margin-top: 50px; padding-top: 5px;">
+                            Assinatura do(a) Paciente/Responsável
+                        </div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="border-top: 1px solid #333; margin-top: 50px; padding-top: 5px;">
+                            Assinatura e carimbo do(a) Fisioterapeuta (CREFITO)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Local</label>
+                <input type="text" class="form-input" id="local" placeholder="Cidade/UF">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Data</label>
+                <input type="date" class="form-input" id="data">
+            </div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">✍️ Assinatura do Paciente</div>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Assine no quadro abaixo usando o dedo:</p>
+            
+            <div class="signature-area">
+                <canvas id="signaturePad" class="signature-pad"></canvas>
+                <span class="signature-label">Toque e arraste para assinar</span>
+            </div>
+            
+            <button class="btn btn-danger" onclick="limparAssinatura()" style="width: 100%; margin-top: 10px;">
+                🗑️ Limpar Assinatura
+            </button>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="salvarDocumento()">
+                💾 Salvar
+            </button>
+            <button class="btn btn-success" onclick="gerarPDF()">
+                📄 PDF
+            </button>
+            <button class="btn btn-warning" onclick="enviarWhatsApp()">
+                💬 WhatsApp
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>ASM Gestão Clínica - Uso Licenciado</p>
+            <p>© Dra. Andresa Augusto Nascimento</p>
+            <p>Proibida reprodução ou compartilhamento sem autorização</p>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Data atual
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('data').value = hoje;
+            
+            // Preview dinâmico
+            document.getElementById('paciente').addEventListener('input', function() {
+                document.getElementById('preview_paciente').textContent = this.value || '____________________';
+            });
+            document.getElementById('cpf').addEventListener('input', function() {
+                document.getElementById('preview_cpf').textContent = this.value || '____________________';
+            });
+            document.getElementById('fisio').addEventListener('input', function() {
+                document.getElementById('preview_fisio').textContent = this.value || '____________________';
+            });
+            document.getElementById('crefito').addEventListener('input', function() {
+                document.getElementById('preview_crefito').textContent = this.value || '____________________';
+            });
+            document.getElementById('local').addEventListener('input', function() {
+                document.getElementById('preview_local').textContent = this.value || '____________________';
+            });
+            document.getElementById('data').addEventListener('change', function() {
+                const data = new Date(this.value);
+                const formatada = data.toLocaleDateString('pt-BR');
+                document.getElementById('preview_data').textContent = formatada;
+            });
+            
+            // Canvas de assinatura
+            inicializarCanvas();
+        });
+        
+        function inicializarCanvas() {
+            const canvas = document.getElementById('signaturePad');
+            const ctx = canvas.getContext('2d');
+            
+            // Ajustar tamanho do canvas
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width - 4;
+            canvas.height = 150;
+            
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            let drawing = false;
+            
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
+            
+            function startDraw(e) {
+                e.preventDefault();
+                drawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                
+                // Esconder label
+                document.querySelector('.signature-label').style.display = 'none';
+            }
+            
+            function draw(e) {
+                e.preventDefault();
+                if (!drawing) return;
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            }
+            
+            function endDraw() {
+                drawing = false;
+            }
+            
+            // Mouse
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('mouseout', endDraw);
+            
+            // Touch
+            canvas.addEventListener('touchstart', startDraw, {passive: false});
+            canvas.addEventListener('touchmove', draw, {passive: false});
+            canvas.addEventListener('touchend', endDraw);
+        }
+        
+        function limparAssinatura() {
+            const canvas = document.getElementById('signaturePad');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.querySelector('.signature-label').style.display = 'block';
+        }
+        
+        function salvarDocumento() {
+            const paciente = document.getElementById('paciente').value;
+            if (!paciente) {
+                mostrarToast('⚠️ Informe o nome do paciente');
+                return;
+            }
+            
+            const canvas = document.getElementById('signaturePad');
+            const assinatura = canvas.toDataURL();
+            
+            const doc = {
+                tipo: 'TCLE_Teleatendimento',
+                paciente: paciente,
+                cpf: document.getElementById('cpf').value,
+                fisioterapeuta: document.getElementById('fisio').value,
+                crefito: document.getElementById('crefito').value,
+                local: document.getElementById('local').value,
+                data: document.getElementById('data').value,
+                assinatura: assinatura,
+                dataCriacao: new Date().toISOString()
+            };
+            
+            // Salvar no localStorage
+            let documentos = JSON.parse(localStorage.getItem('asm_documentos') || '[]');
+            documentos.push(doc);
+            localStorage.setItem('asm_documentos', JSON.stringify(documentos));
+            
+            mostrarToast('✅ Documento salvo com sucesso!');
+        }
+        
+        async function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const paciente = document.getElementById('paciente').value;
+            const cpf = document.getElementById('cpf').value;
+            const fisio = document.getElementById('fisio').value;
+            const crefito = document.getElementById('crefito').value;
+            const local = document.getElementById('local').value;
+            const data = document.getElementById('data').value;
+            
+            // Cabeçalho
+            doc.setFillColor(30, 58, 95);
+            doc.rect(0, 0, 210, 35, 'F');
+            
+            doc.setTextColor(201, 162, 39);
+            doc.setFontSize(18);
+            doc.text('ASM Gestão Clínica', 105, 15, { align: 'center' });
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.text('Gestão Fisioterapêutica', 105, 25, { align: 'center' });
+            
+            // Título
+            doc.setTextColor(30, 58, 95);
+            doc.setFontSize(14);
+            doc.text('TERMO DE CONSENTIMENTO PARA TELEATENDIMENTO FISIOTERAPÊUTICO', 105, 50, { align: 'center' });
+            
+            let y = 65;
+            
+            // Seção 1
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('1) IDENTIFICAÇÃO DAS PARTES', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            doc.text(`Paciente/Responsável: ${paciente || '_________________________________'}`, 20, y);
+            y += 7;
+            doc.text(`CPF: ${cpf || '_________________________________'}`, 20, y);
+            y += 7;
+            doc.text(`Fisioterapeuta: ${fisio || '_________________________________'}`, 20, y);
+            y += 7;
+            doc.text(`CREFITO: ${crefito || '_________________________________'}`, 20, y);
+            
+            // Seção 2
+            y += 12;
+            doc.setFont(undefined, 'bold');
+            doc.text('2) OBJETO DO CONSENTIMENTO', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            doc.setFontSize(10);
+            doc.text('Consentimento para realização de atendimento fisioterapêutico na modalidade de teleatendimento.', 20, y);
+            
+            // Seção 3
+            y += 12;
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('3) ESCLARECIMENTOS E LIMITAÇÕES', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            doc.setFontSize(10);
+            const texto3 = 'O atendimento remoto possui limitações técnicas e não substitui integralmente o atendimento presencial.';
+            const lines3 = doc.splitTextToSize(texto3, 170);
+            doc.text(lines3, 20, y);
+            
+            // Seção 4
+            y += 15;
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('4) DECLARAÇÃO DE CONSENTIMENTO', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            doc.setFontSize(10);
+            const texto4 = 'Declaro que estou ciente e autorizo, de forma livre e esclarecida, a realização do teleatendimento fisioterapêutico.';
+            const lines4 = doc.splitTextToSize(texto4, 170);
+            doc.text(lines4, 20, y);
+            
+            // Seção 5
+            y += 15;
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('5) ENCERRAMENTO', 20, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            const dataFormatada = data ? new Date(data).toLocaleDateString('pt-BR') : '___/___/_____';
+            doc.text(`Local e data: ${local || '____________________'}, ${dataFormatada}`, 20, y);
+            
+            // Assinaturas
+            y += 25;
+            doc.line(20, y, 90, y);
+            doc.line(120, y, 190, y);
+            y += 5;
+            doc.setFontSize(9);
+            doc.text('Assinatura do(a) Paciente/Responsável', 20, y);
+            doc.text('Assinatura e carimbo do(a) Fisioterapeuta (CREFITO)', 120, y);
+            
+            // Rodapé
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('ASM Gestão Clínica -- Uso Licenciado', 105, 285, { align: 'center' });
+            doc.text('© ASM Gestão Clínica -- Dra. Andresa Augusto Nascimento | Uso licenciado ao comprador.', 105, 290, { align: 'center' });
+            doc.text('Proibida reprodução ou compartilhamento sem autorização.', 105, 295, { align: 'center' });
+            
+            doc.save(`TCLE_Teleatendimento_${paciente || 'Paciente'}.pdf`);
+            mostrarToast('📄 PDF gerado com sucesso!');
+        }
+        
+        function enviarWhatsApp() {
+            const paciente = document.getElementById('paciente').value;
+            const fisio = document.getElementById('fisio').value;
+            const data = document.getElementById('data').value;
+            
+            let mensagem = `*Termo de Consentimento - Teleatendimento*%0A%0A`;
+            mensagem += `Paciente: ${paciente}%0A`;
+            mensagem += `Fisioterapeuta: ${fisio}%0A`;
+            mensagem += `Data: ${data}%0A%0A`;
+            mensagem += `Documento gerado via ASM Gestão Clínica`;
+            
+            window.open(`https://wa.me/?text=${mensagem}`, '_blank');
+        }
+        
+        function mostrarToast(mensagem) {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

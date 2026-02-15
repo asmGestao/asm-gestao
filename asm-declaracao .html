@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ASM - Declaração de Comparecimento</title>
+    <style>
+        :root {
+            --azul-marinho: #1e3a5f;
+            --dourado: #c9a227;
+            --cinza-claro: #f5f5f5;
+            --branco: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--cinza-claro);
+            padding: 15px;
+            line-height: 1.6;
+            padding-bottom: 100px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--branco);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--azul-marinho) 0%, #2c4a70 100%);
+            color: var(--branco);
+            padding: 25px;
+            text-align: center;
+            border-bottom: 4px solid var(--dourado);
+        }
+        
+        .header h1 {
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: var(--dourado);
+            font-size: 0.9em;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .field-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: var(--azul-marinho);
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        input[type="text"], input[type="date"], input[type="time"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--azul-marinho);
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .texto-declaracao {
+            background: var(--cinza-claro);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .texto-declaracao input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--azul-marinho);
+            padding: 2px 5px;
+            margin: 0 3px;
+            width: auto;
+            min-width: 100px;
+        }
+        
+        .signature-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid var(--dourado);
+        }
+        
+        .signature-box {
+            border: 2px dashed var(--azul-marinho);
+            border-radius: 10px;
+            background: var(--cinza-claro);
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .signature-canvas {
+            width: 100%;
+            height: 150px;
+            touch-action: none;
+            border-radius: 8px;
+            cursor: crosshair;
+            display: block;
+        }
+        
+        .signature-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+            pointer-events: none;
+            font-size: 0.9em;
+        }
+        
+        .signature-label.hidden {
+            display: none;
+        }
+        
+        .signature-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-clear {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-save {
+            background: var(--azul-marinho);
+            color: var(--branco);
+        }
+        
+        /* Botões flutuantes redondos */
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
+        }
+        
+        .fab-print {
+            background: var(--dourado);
+            color: var(--azul-marinho);
+        }
+        
+        .fab-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        
+        .fab svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #999;
+            font-size: 0.8em;
+            border-top: 1px solid #eee;
+        }
+        
+        .saved-signature {
+            max-width: 100%;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                padding-bottom: 0;
+            }
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .btn, .signature-actions, .fab-container {
+                display: none !important;
+            }
+            input, textarea {
+                border: none;
+                background: transparent;
+                padding: 0;
+            }
+            .signature-box {
+                border: 1px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="documento">
+        <div class="header">
+            <h1>🏥 ASM Gestão Clínica</h1>
+            <p>Gestão Fisioterapêutica</p>
+        </div>
+        
+        <div class="content">
+            <div class="field-group">
+                <label>Fisioterapeuta</label>
+                <input type="text" id="fisio_nome" placeholder="Nome completo">
+            </div>
+            
+            <div class="field-group">
+                <label>CREFITO</label>
+                <input type="text" id="fisio_crefito" placeholder="Nº do CREFITO">
+            </div>
+            
+            <h3 style="color: var(--azul-marinho); margin: 25px 0 15px; text-align: center;">DECLARAÇÃO DE COMPARECIMENTO</h3>
+            
+            <div class="texto-declaracao">
+                DECLARO, para os devidos fins, que o(a) Sr.(a)
+                <input type="text" id="paciente_nome" placeholder="Nome completo" style="width: 100%; display: block; margin: 5px 0;">
+                CPF: <input type="text" id="paciente_cpf" placeholder="000.000.000-00" style="width: 60%;">,
+                compareceu a atendimento/avaliação fisioterapêutica nesta clínica/serviço na data
+                <input type="date" id="data_atend" style="width: 45%;">, no período de 
+                <input type="time" id="hora_inicio" style="width: 35%;"> às 
+                <input type="time" id="hora_fim" style="width: 35%;">.
+                <br><br>
+                Esta declaração é emitida a pedido do(a) interessado(a).
+            </div>
+            
+            <div class="row" style="margin-top: 30px;">
+                <div class="field-group">
+                    <label>Local</label>
+                    <input type="text" id="local" placeholder="Cidade/UF">
+                </div>
+                <div class="field-group">
+                    <label>Data do Documento</label>
+                    <input type="date" id="data_doc">
+                </div>
+            </div>
+            
+            <!-- ASSINATURA DIGITAL -->
+            <div class="signature-section">
+                <div class="field-group">
+                    <label>Assinatura e carimbo do(a) Fisioterapeuta (CREFITO)</label>
+                    <div class="signature-box">
+                        <canvas class="signature-canvas" id="canvasFisio"></canvas>
+                        <span class="signature-label" id="labelFisio">Toque aqui para assinar</span>
+                    </div>
+                    <div class="signature-actions">
+                        <button class="btn btn-clear" onclick="clearSignature()">🗑️ Limpar</button>
+                        <button class="btn btn-save" onclick="saveSignature()">💾 Salvar</button>
+                    </div>
+                    <img id="imgFisio" class="saved-signature" style="display:none;">
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            ASM Gestão Clínica - Uso Licenciado<br>
+            Dra. Andresa Augusto
+        </div>
+    </div>
+
+    <!-- Botões Flutuantes Redondos -->
+    <div class="fab-container">
+        <button class="fab fab-whatsapp" onclick="compartilharWhatsApp()" title="Enviar WhatsApp">
+            <svg viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+        </button>
+        
+        <button class="fab fab-print" onclick="imprimirDocumento()" title="Imprimir / Salvar PDF">
+            <svg viewBox="0 0 24 24">
+                <path d="M19 9h-1V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v3H5a3 3 0 0 0-3 3v4a2 2 0 0 0 2 2h2v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3h2a2 2 0 0 0 2-2v-4a3 3 0 0 0-3-3zM8 6h8v3H8V6zm8 12H8v-5h8v5zm2-8a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('canvasFisio');
+        const ctx = canvas.getContext('2d');
+        const label = document.getElementById('labelFisio');
+        
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.strokeStyle = '#1e3a5f';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            const pos = getPos(e);
+            lastX = pos.x;
+            lastY = pos.y;
+            label.classList.add('hidden');
+            e.preventDefault();
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            lastX = pos.x;
+            lastY = pos.y;
+            e.preventDefault();
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        canvas.addEventListener('touchstart', startDrawing, {passive: false});
+        canvas.addEventListener('touchmove', draw, {passive: false});
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            label.classList.remove('hidden');
+            document.getElementById('imgFisio').style.display = 'none';
+        }
+        
+        function saveSignature() {
+            const img = document.getElementById('imgFisio');
+            img.src = canvas.toDataURL('image/png');
+            img.style.display = 'block';
+        }
+        
+        function isCanvasEmpty() {
+            const blank = document.createElement('canvas');
+            blank.width = canvas.width;
+            blank.height = canvas.height;
+            return canvas.toDataURL() === blank.toDataURL();
+        }
+        
+        function imprimirDocumento() {
+            if (!isCanvasEmpty()) saveSignature();
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        }
+        
+        function compartilharWhatsApp() {
+            const nome = document.getElementById('paciente_nome').value || 'Paciente';
+            const data = document.getElementById('data_atend').value || new Date().toLocaleDateString('pt-BR');
+            const texto = `Olá ${nome}! Segue sua Declaração de Comparecimento da ASM Gestão Clínica referente ao atendimento do dia ${data}. Att, Dra. Andresa Augusto`;
+            
+            window.location.href = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+        }
+        
+        // Datas automáticas
+        document.getElementById('data_atend').valueAsDate = new Date();
+        document.getElementById('data_doc').valueAsDate = new Date();
+        
+        // Carregar dados salvos
+        const dados = JSON.parse(localStorage.getItem('asm_dados') || '{}');
+        if (dados.fisio_nome) document.getElementById('fisio_nome').value = dados.fisio_nome;
+        if (dados.fisio_crefito) document.getElementById('fisio_crefito').value = dados.fisio_crefito;
+        
+        // Salvar dados
+        ['fisio_nome', 'fisio_crefito'].forEach(id => {
+            document.getElementById(id).addEventListener('blur', () => {
+                const dados = JSON.parse(localStorage.getItem('asm_dados') || '{}');
+                dados[id] = document.getElementById(id).value;
+                localStorage.setItem('asm_dados', JSON.stringify(dados));
+            });
+        });
+    </script>
+</body>
+</html>
